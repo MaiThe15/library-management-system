@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bookController = require('../controllers/bookController');
 const { verifyToken, checkRole } = require('../middlewares/authMiddleware');
+const upload = require('../middlewares/uploadMiddleware');
 
 // Route công khai: Lấy danh sách sách
 router.get('/', bookController.getAllBooks);
