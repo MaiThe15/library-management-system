@@ -38,6 +38,41 @@ class BookService {
 
     return newBook;
   }
+
+  // 3. Cập nhật thông tin sách
+  async updateBook(id, data) {
+    const book = await Sach.findByPk(id);
+    if (!book) throw new Error('Không tìm thấy sách!');
+
+    // Tách riêng mảng thể loại ra khỏi data cập nhật
+    const { theLoaiIds, ...updateData } = data;
+
+    // Nếu TongSoLuong thay đổi, cần tính lại SoLuongSanSang (logic cơ bản: lấy số lượng sẵn sàng hiện tại + phần chênh lệch)
+    if (updateData.TongSoLuong !== undefined && updateData.TongSoLuong !== book.TongSoLuong) {
+      const difference = updateData.TongSoLuong - book.TongSoLuong;
+      updateData.SoLuongSanSang = book.SoLuongSanSang + difference;
+      updateData.TrangThai = updateData.SoLuongSanSang > 0 ? 'CO_SAN' : 'HET_SACH';
+    }
+
+    await book.update(updateData);
+
+    // Cập nhật lại danh sách Thể loại nếu có truyền lên
+    if (theLoaiIds) {
+      await book.setTheLoais(theLoaiIds);
+    }
+
+    return book;
+  }
+
+  // 4. Xóa sách
+  async deleteBook(id) {
+    const book = await Sach.findByPk(id);
+    if (!book) throw new Error('Không tìm thấy sách!');
+    
+    // Sequelize sẽ tự động xóa các bản ghi liên quan trong bảng trung gian TheLoai_Sachs nhờ onDelete: 'CASCADE'
+    await book.destroy();
+    return true;
+  }
 }
 
 module.exports = new BookService();
