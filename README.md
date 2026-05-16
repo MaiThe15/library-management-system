@@ -10,7 +10,7 @@
 `cd backend`
 `npm install`
 (Tạo file .env theo mẫu .env.example và điền DB Connection String)
-`npm run dev` (Server sẽ chạy ở http://localhost:5000)
+`node server.js` (Server sẽ chạy ở http://localhost:5000)
 
 **Bước 3:** Chạy Frontend (ReactJS)
 Mở một terminal mới:
