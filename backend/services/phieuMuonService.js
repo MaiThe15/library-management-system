@@ -83,3 +83,44 @@ exports.getAllBorrowSlips = async () => {
     order: [['NgayMuon', 'DESC']]
   });
 };
+
+exports.traPhieuMuon = async (idPhieuMuon) => {
+  const t = await sequelize.transaction();
+
+  try {
+    // 1. Kiểm tra phiếu mượn
+    const phieuMuon = await PhieuMuon.findByPk(idPhieuMuon, { transaction: t });
+    if (!phieuMuon) throw new Error('Không tìm thấy phiếu mượn trong hệ thống.');
+    if (phieuMuon.TrangThai === 'Đã trả') throw new Error('Phiếu mượn này đã được hoàn tất trả trước đó.');
+
+    // 2. Cập nhật trạng thái phiếu gốc
+    await phieuMuon.update({ TrangThai: 'Đã trả' }, { transaction: t });
+
+    // 3. Cập nhật chi tiết phiếu và HOÀN TRẢ SỐ LƯỢNG SÁCH
+    const chiTietPhieu = await CT_PhieuMuon.findAll({
+      where: { IDPhieuMuon: idPhieuMuon },
+      transaction: t
+    });
+
+    for (const ct of chiTietPhieu) {
+      // Đổi trạng thái dòng chi tiết
+      await ct.update({ TrangThai: 'Đã trả' }, { transaction: t });
+
+      // Tìm cuốn sách và cộng lại 1 đơn vị vào SoLuongSanSang
+      const sach = await Sach.findByPk(ct.IDSach, { transaction: t });
+      if (sach) {
+        await sach.update({
+          SoLuongSanSang: sach.SoLuongSanSang + 1
+        }, { transaction: t });
+      }
+    }
+
+    // Xác nhận lưu toàn bộ thay đổi
+    await t.commit();
+    return phieuMuon;
+
+  } catch (error) {
+    await t.rollback();
+    throw error;
+  }
+};

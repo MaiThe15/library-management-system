@@ -9,4 +9,6 @@ router.get('/', phieuMuonController.getAllBorrowSlips);
 // Route chỉ dành cho Thủ thư (hoặc nhân viên có quyền)
 router.post('/create', verifyToken, phieuMuonController.createBorrowSlip);
 
+router.put('/:id/return', phieuMuonController.returnBorrowSlip);
+
 module.exports = router;
