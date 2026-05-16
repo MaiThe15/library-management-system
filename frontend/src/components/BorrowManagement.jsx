@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import sharedStyles from '../pages/StaffHome.module.css'; // Layout gốc của hệ thống
 import styles from './BorrowManagement.module.css'; // CSS Module riêng biệt của component
-import { createBorrowSlip, fetchAllBorrowSlips } from '../services/phieuMuonService';
+import { createBorrowSlip, fetchAllBorrowSlips, returnBorrowSlip } from '../services/phieuMuonService';
 
 const BorrowManagement = ({ books }) => {
   // Trạng thái kiểm soát đóng/mở Modal Form
@@ -90,6 +90,19 @@ const BorrowManagement = ({ books }) => {
     return date.toLocaleDateString('vi-VN');
   };
 
+  const handleReturnSlip = async (idPhieuMuon) => {
+    if (window.confirm('Xác nhận độc giả đã trả đủ sách cho phiếu này?')) {
+      try {
+        await returnBorrowSlip(idPhieuMuon);
+        alert('✅ Xác nhận trả sách thành công!');
+        loadBorrowSlips(); // Tải lại bảng để cập nhật trạng thái
+        // (Nếu bạn có truyền props onRefreshBooks từ component cha, hãy gọi ở đây để cập nhật lại số lượng sách kho)
+      } catch (error) {
+        alert(`Lỗi: ${error.message}`);
+      }
+    }
+  };
+
   return (
     <div className={styles.container}>
       {/* THANH ĐIỀU KHIỂN CHÍNH */}
@@ -113,6 +126,7 @@ const BorrowManagement = ({ books }) => {
               <th>Ngày mượn</th>
               <th>Hạn trả</th>
               <th>Trạng thái</th>
+              <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
@@ -140,6 +154,19 @@ const BorrowManagement = ({ books }) => {
                   }`}>
                     {slip.TrangThai}
                   </span>
+                </td>
+                <td>
+                  {slip.TrangThai === 'Đang mượn' && (
+                    <button 
+                      onClick={() => handleReturnSlip(slip.IDPhieuMuon)}
+                      style={{
+                        backgroundColor: '#10b981', color: 'white', border: 'none', 
+                        padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: '500'
+                      }}
+                    >
+                      Nhận Trả Sách
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

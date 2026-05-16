@@ -25,3 +25,15 @@ export const createBorrowSlip = async (borrowData) => {
     throw new Error('Lỗi kết nối đến máy chủ khi tạo phiếu mượn.');
   }
 };
+
+export const returnBorrowSlip = async (id) => {
+  try {
+    const response = await api.put(`/phieumuon/${id}/return`);
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.message);
+    }
+    throw new Error('Lỗi kết nối máy chủ khi xử lý trả sách.');
+  }
+};
