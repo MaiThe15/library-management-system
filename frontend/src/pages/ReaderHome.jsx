@@ -1,21 +1,160 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { fetchAllBooks } from '../services/bookService';
+import styles from './ReaderHome.module.css';
 
 const ReaderHome = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const getBooks = async () => {
+      try {
+        const data = await fetchAllBooks();
+        setBooks(data);
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu sách:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getBooks();
+  }, []);
 
   const handleLogout = () => {
     localStorage.clear();
     navigate('/login');
   };
 
+  // Lấy ra 5 cuốn sách đầu tiên cho phần "Sách mới nhập"
+  const newBooks = books.slice(0, 5);
+  
+  // Tạm thời lấy 3 cuốn làm dữ liệu giả lập cho "Sách mượn nhiều nhất"
+  const popularBooks = books.slice(0, 3);
+
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Chào mừng Độc giả: {user?.HoTen}</h1>
-      <p>Email: {user?.Email}</p>
-      <button onClick={handleLogout} className="btn-submit" style={{ width: 'auto' }}>Đăng xuất</button>
+    <div className={styles['reader-layout']}>
+      {/* 1. HEADER */}
+      <header className={styles['main-header']}>
+        <div className={styles.logo}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <span>Thư viện Số</span>
+        </div>
+        <nav className={styles['main-nav']}>
+          <Link to="/reader-home" className={styles.active}>Trang chủ</Link>
+          <Link to="#">Thể loại</Link>
+          <Link to="#">Tài khoản</Link>
+        </nav>
+        <div className={styles['header-actions']}>
+          <button onClick={handleLogout} className={styles['btn-outline']}>Đăng xuất</button>
+          <div className={styles.avatar}>{user?.HoTen?.charAt(0) || 'U'}</div>
+        </div>
+      </header>
+
+      {/* 2. HERO SECTION */}
+      <section className={styles['hero-banner']}>
+        <div className={styles['hero-overlay']}></div>
+        <div className={styles['hero-content']}>
+          <h1>Khám phá kho tàng tri thức<br/>vô tận</h1>
+          <p>Tìm kiếm hàng ngàn cuốn sách, tài liệu học thuật và tiểu thuyết mới nhất từ khắp nơi trên thế giới.</p>
+          <div className={styles['hero-content']}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" placeholder="Nhập tên sách, tác giả hoặc mã ISBN..." />
+            <button className={styles['btn-search']}>Tìm kiếm</button>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. SÁCH MỚI NHẬP */}
+      <section className={styles['content-section']}>
+        <div className={styles['section-header']}>
+          <div className={styles['title-wrapper']}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <h2>Sách mới nhập</h2>
+          </div>
+          <Link to="#" className={styles['view-all']}>Xem tất cả</Link>
+        </div>
+
+        {loading ? <p>Đang tải dữ liệu...</p> : (
+          <div className={styles['books-row']}>
+            {newBooks.map((book) => (
+              <div className={styles['book-card-modern']} key={book.IDSach}>
+                <div className={styles['book-image-wrapper']}>
+                  <img src={book.AnhBia} alt={book.TenSach} />
+                </div>
+                <div className={styles['book-card-info']}>
+                  <h4 title={book.TenSach}>{book.TenSach}</h4>
+                  <p className={styles.author}>{book.tacGia?.TenTacGia || 'Đang cập nhật'}</p>
+                  {book.theLoais && book.theLoais.length > 0 && (
+                    <span className={styles['category-badge']}>{book.theLoais[0].TenTheLoai}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* 4. SÁCH MƯỢN NHIỀU NHẤT */}
+      <section className={styles["content-section"]}>
+        <div className={styles["section-header"]}>
+          <div className={styles["title-wrapper"]}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+            <h2>Sách mượn nhiều nhất</h2>
+          </div>
+        </div>
+
+        <div className={styles["popular-list"]}>
+          {popularBooks.map((book, index) => (
+            <div className={styles["popular-item"]} key={book.IDSach}>
+              <div className={styles["rank"]}>0{index + 1}</div>
+              <img src={book.AnhBia} alt={book.TenSach} className={styles["tiny-cover"]} />
+              <div className={styles["popular-info"]}>
+                <h4>{book.TenSach}</h4>
+                <p>{book.tacGia?.TenTacGia || 'Đang cập nhật'}</p>
+              </div>
+              <div className={styles["popular-stats"]}>
+                <span className={styles["stat"]}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> 1,204</span>
+                <span className={styles["stat"]}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> 850</span>
+              </div>
+              <button className={styles["btn-icon"]}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 5. FOOTER */}
+      <footer className={styles["main-footer"]}>
+        <div className={styles["footer-cols"]}>
+          <div className={styles["col-brand"]}>
+            <div className={styles["logo"]}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+              <span>Thư viện Số</span>
+            </div>
+            <p>Kết nối tri thức, khơi nguồn sáng tạo qua hàng triệu đầu sách số hóa chất lượng cao.</p>
+          </div>
+          <div className={styles["col-links"]}>
+            <h4>Liên kết</h4>
+            <a href="#">Về chúng tôi</a>
+            <a href="#">Chính sách mượn sách</a>
+            <a href="#">Câu hỏi thường gặp</a>
+          </div>
+          <div className={styles["col-contact"]}>
+            <h4>Liên hệ</h4>
+            <p>✉️ contact@library.vn</p>
+            <p>📞 +84 123 456 789</p>
+          </div>
+        </div>
+        <div className={styles["footer-bottom"]}>
+          <p>© 2026 Thư viện Số. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
 };
+
 export default ReaderHome;
