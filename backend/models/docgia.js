@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
   class DocGia extends Model {
     static associate(models) {
       DocGia.belongsTo(models.TaiKhoan, { foreignKey: 'IDTaiKhoan', as: 'taiKhoan' });
+      DocGia.hasMany(models.PhieuMuon, { foreignKey: 'IDDocGia', as: 'phieuMuons' });
     }
   }
   DocGia.init({

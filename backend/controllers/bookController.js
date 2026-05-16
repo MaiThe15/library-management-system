@@ -42,6 +42,9 @@ exports.updateBook = async (req, res) => {
       bookData.theLoaiIds = JSON.parse(bookData.theLoaiIds);
     }
 
+    if (bookData.IDTacGia === '') bookData.IDTacGia = null;
+    if (bookData.IDViTri === '') bookData.IDViTri = null;
+
     // Nếu có upload ảnh mới, cập nhật đường dẫn ảnh
     if (req.file) {
       bookData.AnhBia = `/${req.file.path.replace(/\\/g, '/')}`;

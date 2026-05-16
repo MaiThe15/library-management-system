@@ -39,7 +39,32 @@ class BookService {
     return newBook;
   }
 
-  // 3. Cập nhật thông tin sách
+  // // 3. Cập nhật thông tin sách
+  // async updateBook(id, data) {
+  //   const book = await Sach.findByPk(id);
+  //   if (!book) throw new Error('Không tìm thấy sách!');
+
+  //   // Tách riêng mảng thể loại ra khỏi data cập nhật
+  //   const { theLoaiIds, ...updateData } = data;
+
+  //   // Nếu TongSoLuong thay đổi, cần tính lại SoLuongSanSang (logic cơ bản: lấy số lượng sẵn sàng hiện tại + phần chênh lệch)
+  //   if (updateData.TongSoLuong !== undefined && updateData.TongSoLuong !== book.TongSoLuong) {
+  //     const difference = updateData.TongSoLuong - book.TongSoLuong;
+  //     updateData.SoLuongSanSang = book.SoLuongSanSang + difference;
+  //     updateData.TrangThai = updateData.SoLuongSanSang > 0 ? 'CO_SAN' : 'HET_SACH';
+  //   }
+
+  //   await book.update(updateData);
+
+  //   // Cập nhật lại danh sách Thể loại nếu có truyền lên
+  //   if (theLoaiIds) {
+  //     await book.setTheLoais(theLoaiIds);
+  //   }
+
+  //   return book;
+  // }
+
+  // 3. Cập nhật thông tin sách (File: backend/services/bookService.js)
   async updateBook(id, data) {
     const book = await Sach.findByPk(id);
     if (!book) throw new Error('Không tìm thấy sách!');
@@ -47,21 +72,40 @@ class BookService {
     // Tách riêng mảng thể loại ra khỏi data cập nhật
     const { theLoaiIds, ...updateData } = data;
 
-    // Nếu TongSoLuong thay đổi, cần tính lại SoLuongSanSang (logic cơ bản: lấy số lượng sẵn sàng hiện tại + phần chênh lệch)
+    // Phòng thủ lỗi chuỗi rỗng gửi từ form sửa khi tác giả/vị trí bị bỏ trống
+    if (updateData.IDTacGia === '') updateData.IDTacGia = null;
+    if (updateData.IDViTri === '') updateData.IDViTri = null;
+
+    // Nếu TongSoLuong thay đổi, cần tính lại SoLuongSanSang
     if (updateData.TongSoLuong !== undefined && updateData.TongSoLuong !== book.TongSoLuong) {
       const difference = updateData.TongSoLuong - book.TongSoLuong;
       updateData.SoLuongSanSang = book.SoLuongSanSang + difference;
       updateData.TrangThai = updateData.SoLuongSanSang > 0 ? 'CO_SAN' : 'HET_SACH';
     }
 
+    // Tiến hành cập nhật các trường cơ bản của sách
     await book.update(updateData);
 
-    // Cập nhật lại danh sách Thể loại nếu có truyền lên
+    // Cập nhật lại danh sách Thể loại trong bảng trung gian nếu có truyền lên
     if (theLoaiIds) {
       await book.setTheLoais(theLoaiIds);
     }
 
-    return book;
+    // === ĐOẠN SỬA QUAN TRỌNG: Truy vấn lại toàn bộ thông tin đầy đủ kèm liên kết bảng trước khi trả về ===
+    const updatedBookFull = await Sach.findByPk(id, {
+      include: [
+        { model: TacGia, as: 'tacGia', attributes: ['TenTacGia'] },
+        { model: ViTriLuuTru, as: 'viTri', attributes: ['KhuVuc', 'Tang', 'KeSach'] },
+        { 
+          model: TheLoai, 
+          as: 'theLoais', 
+          attributes: ['IDTheLoai', 'TenTheLoai'], // Đảm bảo lấy đủ cả ID và Tên để React render
+          through: { attributes: [] }
+        }
+      ]
+    });
+
+    return updatedBookFull;
   }
 
   // 4. Xóa sách
