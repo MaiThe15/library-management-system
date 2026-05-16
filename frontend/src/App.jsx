@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import ReaderHome from './pages/ReaderHome';
 import StaffHome from './pages/StaffHome';
 import BookDetail from './pages/BookDetail';
+import ReaderAccount from './pages/ReaderAccount';
 
 const PrivateRoute = ({ children, role }) => {
   const token = localStorage.getItem('token');
@@ -26,6 +27,10 @@ function App() {
         {/* Route bảo vệ cho Độc giả */}
         <Route path="/reader-home" element={
           <PrivateRoute role="DOC_GIA"><ReaderHome /></PrivateRoute>
+        } />
+        {/* Route mới cho phần Tài khoản của độc giả */}
+        <Route path="/account" element={
+          <PrivateRoute role="DOC_GIA"><ReaderAccount /></PrivateRoute>
         } />
 
         {/* Route bảo vệ cho Nhân viên */}

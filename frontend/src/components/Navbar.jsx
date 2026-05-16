@@ -23,8 +23,8 @@ const Navbar = () => {
       </div>
       <nav className={styles.mainNav}>
         <Link to="/reader-home" className={location.pathname === '/reader-home' ? styles.active : ''}>Trang chủ</Link>
-        <Link to="#">Thể loại</Link>
-        <Link to="#">Tài khoản</Link>
+        <Link to="#">Giỏ hàng</Link>
+        <Link to="/account" className={location.pathname === '/account' ? styles.active : ''}>Tài khoản</Link>
       </nav>
       <div className={styles.headerActions}>
         <button onClick={handleLogout} className={styles.btnOutline}>Đăng xuất</button>

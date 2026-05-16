@@ -19,3 +19,13 @@ export const toggleReaderStatus = async (id) => {
     throw new Error(error.response?.data?.message || 'Lỗi xử lý cập nhật trạng thái tài khoản.');
   }
 };
+
+// API cập nhật thông tin cá nhân của độc giả
+export const updateReaderProfile = async (profileData) => {
+  try {
+    const response = await api.put('/docgia/profile', profileData);
+    return response.data; // Trả về data gồm thông tin user mới
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể cập nhật thông tin cá nhân.');
+  }
+};
