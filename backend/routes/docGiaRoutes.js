@@ -7,4 +7,7 @@ const { verifyToken } = require('../middlewares/authMiddleware');
 router.get('/', verifyToken, docGiaController.getAllReaders);
 router.put('/:id/status', verifyToken, docGiaController.toggleStatus);
 
+// route cập nhật thông tin phân hệ độc giả
+router.put('/profile', verifyToken, docGiaController.updateProfile);
+
 module.exports = router;
