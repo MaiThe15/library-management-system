@@ -4,6 +4,7 @@ import Register from './pages/Register';
 // import './App.css';
 import ReaderHome from './pages/ReaderHome';
 import StaffHome from './pages/StaffHome';
+import BookDetail from './pages/BookDetail';
 
 const PrivateRoute = ({ children, role }) => {
   const token = localStorage.getItem('token');
@@ -33,6 +34,8 @@ function App() {
         } />
 
         <Route path="/" element={<Navigate to="/login" />} />
+
+        <Route path="/book/:id" element={<BookDetail />} />
       </Routes>
     </Router>
   );

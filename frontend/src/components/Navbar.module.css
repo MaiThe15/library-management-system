@@ -1,0 +1,72 @@
+.mainHeader {
+  position: sticky; /* Giữ thanh nav luôn cố định khi cuộn */
+  top: 0;
+  z-index: 1000; /* Đảm bảo nav luôn nằm đè lên các phần tử khác khi cuộn qua */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 5%;
+  border-bottom: 1px solid #f3f4f6;
+  background: rgba(255, 255, 255, 0.95); /* Màu nền trắng có chút trong suốt nhẹ */
+  backdrop-filter: blur(8px); /* Tạo hiệu ứng mờ kính cao cấp sau thanh nav */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 18px;
+  color: #111827;
+}
+
+.mainNav {
+  display: flex;
+  gap: 30px;
+}
+
+.mainNav a {
+  text-decoration: none;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.mainNav a:hover, .mainNav a.active {
+  color: #2563eb;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.btnOutline {
+  padding: 8px 16px;
+  background: #eff6ff;
+  color: #2563eb;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btnOutline:hover {
+  background: #dbeafe;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  background: #e5e7eb;
+  color: #4b5563;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}

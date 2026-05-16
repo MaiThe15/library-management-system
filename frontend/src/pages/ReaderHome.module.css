@@ -5,64 +5,6 @@
   background-color: #ffffff;
 }
 
-/* --- HEADER --- */
-.main-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 5%;
-  border-bottom: 1px solid #f3f4f6;
-  background: white;
-}
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-  font-size: 18px;
-  color: #111827;
-}
-.main-nav {
-  display: flex;
-  gap: 30px;
-}
-.main-nav a {
-  text-decoration: none;
-  color: #6b7280;
-  font-size: 14px;
-  font-weight: 500;
-  transition: 0.3s;
-}
-.main-nav a:hover, .main-nav a.active {
-  color: #2563eb;
-}
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-.btn-outline {
-  padding: 8px 16px;
-  background: #eff6ff;
-  color: #2563eb;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-}
-.avatar {
-  width: 36px;
-  height: 36px;
-  background: #e5e7eb;
-  color: #4b5563;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-}
-
 /* --- HERO SECTION --- */
 .hero-banner {
   position: relative;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { fetchAllBooks } from '../services/bookService';
 import styles from './ReaderHome.module.css';
+import Navbar from '../components/Navbar';
 
 const ReaderHome = () => {
   const navigate = useNavigate();
@@ -37,21 +38,7 @@ const ReaderHome = () => {
   return (
     <div className={styles['reader-layout']}>
       {/* 1. HEADER */}
-      <header className={styles['main-header']}>
-        <div className={styles.logo}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-          <span>Thư viện Số</span>
-        </div>
-        <nav className={styles['main-nav']}>
-          <Link to="/reader-home" className={styles.active}>Trang chủ</Link>
-          <Link to="#">Thể loại</Link>
-          <Link to="#">Tài khoản</Link>
-        </nav>
-        <div className={styles['header-actions']}>
-          <button onClick={handleLogout} className={styles['btn-outline']}>Đăng xuất</button>
-          <div className={styles.avatar}>{user?.HoTen?.charAt(0) || 'U'}</div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* 2. HERO SECTION */}
       <section className={styles['hero-banner']}>
@@ -80,9 +67,18 @@ const ReaderHome = () => {
         {loading ? <p>Đang tải dữ liệu...</p> : (
           <div className={styles['books-row']}>
             {newBooks.map((book) => (
-              <div className={styles['book-card-modern']} key={book.IDSach}>
+              <div 
+                className={styles['book-card-modern']} 
+                key={book.IDSach}
+                onClick={() => navigate(`/book/${book.IDSach}`)} 
+                style={{ cursor: 'pointer' }}
+              >
                 <div className={styles['book-image-wrapper']}>
-                  <img src={book.AnhBia} alt={book.TenSach} />
+                  <img 
+                    src={`http://localhost:5000${book.AnhBia}`} 
+                    alt={book.TenSach} 
+                    onError={(e) => { e.target.src = 'https://via.placeholder.com/180x260' }} // Hiện ảnh thay thế nếu link lỗi
+                  />
                 </div>
                 <div className={styles['book-card-info']}>
                   <h4 title={book.TenSach}>{book.TenSach}</h4>
@@ -110,7 +106,12 @@ const ReaderHome = () => {
           {popularBooks.map((book, index) => (
             <div className={styles["popular-item"]} key={book.IDSach}>
               <div className={styles["rank"]}>0{index + 1}</div>
-              <img src={book.AnhBia} alt={book.TenSach} className={styles["tiny-cover"]} />
+              <img 
+                src={`http://localhost:5000${book.AnhBia}`} 
+                alt={book.TenSach} 
+                className={styles['tiny-cover']} 
+                onError={(e) => { e.target.src = 'https://via.placeholder.com/40x55' }}
+              />
               <div className={styles["popular-info"]}>
                 <h4>{book.TenSach}</h4>
                 <p>{book.tacGia?.TenTacGia || 'Đang cập nhật'}</p>
