@@ -37,3 +37,12 @@ export const returnBorrowSlip = async (id) => {
     throw new Error('Lỗi kết nối máy chủ khi xử lý trả sách.');
   }
 };
+
+export const fetchMyBorrowHistory = async () => {
+  try {
+    const response = await api.get('/phieumuon/my-history');
+    return response.data.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể tải lịch sử mượn sách.');
+  }
+};
