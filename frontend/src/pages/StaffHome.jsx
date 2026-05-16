@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { fetchAllBooks, fetchBookMetadata } from '../services/bookService';
 import styles from './StaffHome.module.css';
 import BorrowManagement from '../components/BorrowManagement';
-import BookManagement from '../components/BookManagement'; // Import component vừa tạo
+import BookManagement from '../components/BookManagement';
+import ReaderManagement from '../components/ReaderManagement';
 
 const StaffHome = () => {
   const navigate = useNavigate();
@@ -117,8 +118,14 @@ const StaffHome = () => {
             <BorrowManagement books={books} />
           )}
 
+          {activeTab === 'thong-tin-doc-gia' && (
+            <ReaderManagement />
+          )}
+
           {/* CÁC PHÂN HỆ CHỜ TÍCH HỢP KHÁC */}
-          {activeTab !== 'quan-ly-danh-muc' && activeTab !== 'quan-ly-muon-tra' && (
+          {activeTab !== 'quan-ly-danh-muc' && activeTab !== 'quan-ly-muon-tra'
+          && activeTab !== 'thong-tin-doc-gia'
+          && (
             <div className={styles.emptyFeature}>
               <h3>Hệ thống đang kết nối dữ liệu...</h3>
               <p>Màn hình nghiệp vụ của phân hệ <strong>"{activeTab}"</strong> đang chờ tích hợp logic APIs ở các bước sau.</p>
