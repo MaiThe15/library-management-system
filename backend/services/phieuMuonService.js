@@ -124,3 +124,19 @@ exports.traPhieuMuon = async (idPhieuMuon) => {
     throw error;
   }
 };
+
+exports.getReaderBorrowHistory = async (idDocGia) => {
+  return await PhieuMuon.findAll({
+    where: { IDDocGia: idDocGia },
+    include: [
+      {
+        model: CT_PhieuMuon,
+        as: 'chiTietPhieuMuons', // Khớp với alias trong model phieumuon.js
+        include: [
+          { model: Sach, as: 'Sach', attributes: ['TenSach', 'AnhBia'] } // Khớp với alias trong ct_phieumuon.js
+        ]
+      }
+    ],
+    order: [['NgayMuon', 'DESC']] // Phiếu mới mượn hiển thị lên đầu
+  });
+};

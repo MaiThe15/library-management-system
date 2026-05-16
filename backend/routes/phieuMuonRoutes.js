@@ -11,4 +11,7 @@ router.post('/create', verifyToken, phieuMuonController.createBorrowSlip);
 
 router.put('/:id/return', phieuMuonController.returnBorrowSlip);
 
+// xem lịch sử mượn sách của phân hệ độc giả
+router.get('/my-history', verifyToken, phieuMuonController.getReaderHistory);
+
 module.exports = router;

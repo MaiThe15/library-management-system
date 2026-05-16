@@ -56,3 +56,22 @@ exports.returnBorrowSlip = async (req, res) => {
     return res.status(400).json({ message: error.message });
   }
 };
+
+exports.getReaderHistory = async (req, res) => {
+  try {
+    // Middleware verifyToken giải mã token độc giả sẽ gán thông tin vào req.user
+    const idDocGia = req.user.IDDocGia; 
+    
+    if (!idDocGia) {
+      return res.status(403).json({ message: 'Tài khoản không có quyền truy cập chức năng độc giả.' });
+    }
+
+    const history = await phieuMuonService.getReaderBorrowHistory(idDocGia);
+    return res.status(200).json({
+      message: 'Lấy lịch sử mượn sách cá nhân thành công!',
+      data: history
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
