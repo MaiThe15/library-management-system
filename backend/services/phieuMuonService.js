@@ -1,7 +1,14 @@
-const { sequelize, PhieuMuon, CT_PhieuMuon, Sach } = require('../models');
+const { sequelize, PhieuMuon, CT_PhieuMuon, Sach, DocGia, NhanVien } = require('../models');
 
 exports.taoPhieuMuon = async (data) => {
   const { idDocGia, idNhanVien, danhSachIdSach } = data;
+
+  // KIỂM TRA ĐỘC GIẢ TRƯỚC KHI CHẠY TRANSACTION
+  const docGia = await DocGia.findByPk(idDocGia);
+  if (!docGia) {
+    // Ném lỗi thân thiện để giao diện hiển thị cho người dùng
+    throw new Error(`Độc giả có mã số ${idDocGia} không tồn tại trong hệ thống. Vui lòng kiểm tra lại!`);
+  }
 
   // BẮT ĐẦU TRANSACTION
   const t = await sequelize.transaction();
@@ -50,4 +57,29 @@ exports.taoPhieuMuon = async (data) => {
     await t.rollback();
     throw error; // Ném lỗi ra để Controller xử lý
   }
+};
+
+exports.getAllBorrowSlips = async () => {
+  return await PhieuMuon.findAll({
+    include: [
+      { 
+        model: DocGia, 
+        as: 'docGia', // Bắt buộc phải có vì model định nghĩa as: 'docGia'
+        attributes: ['HoTen', 'SoDienThoai'] 
+      },
+      { 
+        model: NhanVien, 
+        as: 'nhanVien', // Bắt buộc phải có
+        attributes: ['HoTen'] 
+      },
+      {
+        model: CT_PhieuMuon,
+        as: 'chiTietPhieuMuons', // Bắt buộc phải có
+        include: [
+          { model: Sach, as: 'Sach', attributes: ['TenSach'] } // (Nếu ct_phieumuon.js bạn cũng đặt as: 'sach', nếu không có as thì bỏ đoạn as: 'sach' này đi)
+        ]
+      }
+    ],
+    order: [['NgayMuon', 'DESC']]
+  });
 };

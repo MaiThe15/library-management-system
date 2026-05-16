@@ -30,3 +30,15 @@ exports.createBorrowSlip = async (req, res) => {
     return res.status(statusCode).json({ message: error.message });
   }
 };
+
+exports.getAllBorrowSlips = async (req, res) => {
+  try {
+    const slips = await phieuMuonService.getAllBorrowSlips();
+    return res.status(200).json({ 
+      message: 'Lấy danh sách phiếu mượn thành công!', 
+      data: slips 
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
