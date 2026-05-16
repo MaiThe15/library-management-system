@@ -1,7 +1,27 @@
-import axios from '../api/axios'; // Đảm bảo bạn import đúng file config axios của dự án
+import api from '../api/axios'; // Đổi tên thành api cho đồng nhất với các service khác (nếu bạn đang dùng tên này)
+
+export const fetchAllBorrowSlips = async () => {
+  try {
+    const response = await api.get('/phieumuon');
+    return response.data.data;
+  } catch (error) {
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.message);
+    }
+    throw new Error('Không thể tải danh sách phiếu mượn từ máy chủ.');
+  }
+};
 
 export const createBorrowSlip = async (borrowData) => {
-  // borrowData sẽ có dạng: { idDocGia: 1, danhSachIdSach: [1, 2] }
-  const response = await axios.post('/api/phieumuon/create', borrowData);
-  return response.data;
+  try {
+    // Lưu ý: Nếu api/axios.js đã cấu hình baseURL là '/api', bạn chỉ cần gọi '/phieumuon/create'
+    const response = await api.post('/phieumuon/create', borrowData);
+    return response.data;
+  } catch (error) {
+    // Bắt và ném lỗi từ backend (ví dụ: lỗi 400 hết sách) để UI có thể hiển thị thông báo
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.message);
+    }
+    throw new Error('Lỗi kết nối đến máy chủ khi tạo phiếu mượn.');
+  }
 };
