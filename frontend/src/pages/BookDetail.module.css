@@ -1,0 +1,119 @@
+.detailContainer {
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+.detailWrapper {
+  padding: 40px 10%;
+}
+
+.detailCard {
+  display: flex;
+  gap: 50px;
+  background-color: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.leftColumn {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.coverImage {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.rightColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.bookTitle {
+  font-size: 32px;
+  margin: 0 0 10px 0;
+  color: #0f172a;
+}
+
+.bookAuthor {
+  font-size: 18px;
+  color: #64748b;
+  margin: 0 0 15px 0;
+}
+
+.genresWrapper {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.genreBadge {
+  font-size: 12px;
+  background: #eff6ff;
+  color: #2563eb;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.infoBlock {
+  background-color: #f1f5f9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.infoTitle {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #334155;
+}
+
+.infoText {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.actionBlock {
+  margin-top: auto;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 30px;
+}
+
+.btnPrimary {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background-color: #2563eb;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnPrimary:hover {
+  background-color: #1d4ed8;
+}
+
+.btnSecondary {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #b45309;
+  background-color: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnSecondary:hover {
+  background-color: #fde68a;
+}
