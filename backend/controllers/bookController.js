@@ -91,7 +91,8 @@ exports.getBookById = async (req, res) => {
         { 
           model: TheLoai, 
           as: 'theLoais', 
-          attributes: ['TenTheLoai'],
+          // Sửa ở dòng dưới đây: Thêm 'IDTheLoai'
+          attributes: ['IDTheLoai', 'TenTheLoai'],
           through: { attributes: [] } 
         }
       ]
