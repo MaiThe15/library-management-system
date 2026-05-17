@@ -1,11 +1,27 @@
 import React from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const user = JSON.parse(localStorage.getItem('user'));
+
+  // State để quản lý số lượng phần tử trong giỏ mượn
+  const [cartCount, setCartCount] = useState(0);
+  useEffect(() => {
+    // Hàm cập nhật số lượng sách từ localStorage
+    const updateCount = () => {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      setCartCount(cart.length);
+    };
+    // Chạy lần đầu khi component mount
+    updateCount();
+    // Lắng nghe sự kiện thay đổi giỏ hàng
+    window.addEventListener('cartUpdated', updateCount);
+    return () => window.removeEventListener('cartUpdated', updateCount);
+  }, []);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -23,7 +39,10 @@ const Navbar = () => {
       </div>
       <nav className={styles.mainNav}>
         <Link to="/reader-home" className={location.pathname === '/reader-home' ? styles.active : ''}>Trang chủ</Link>
-        <Link to="#">Giỏ hàng</Link>
+        <Link to="/cart" className={location.pathname === '/cart' ? styles.active : ''}>
+          Giỏ mượn
+          {cartCount > 0 && <span className={styles.cartBadge}>{cartCount}</span>}
+        </Link>
         <Link to="/account" className={location.pathname === '/account' ? styles.active : ''}>Tài khoản</Link>
       </nav>
       <div className={styles.headerActions}>

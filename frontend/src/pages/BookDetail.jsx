@@ -37,6 +37,7 @@ const BookDetail = () => {
       TacGia: book.tacGia?.TenTacGia
     });
     localStorage.setItem('cart', JSON.stringify(currentCart));
+    window.dispatchEvent(new Event('cartUpdated'));
     alert('🛒 Đã thêm vào giỏ mượn thành công!');
   };
 
