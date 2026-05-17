@@ -1,0 +1,234 @@
+.layout {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.container {
+  max-width: 1250px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+/* --- SIDEBAR BỘ LỌC --- */
+.sidebar {
+  width: 260px;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+  position: sticky; /* Giúp sidebar đứng yên khi cuộn grid sách */
+  top: 90px;
+}
+
+.sidebar h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #1f2937;
+  font-size: 1.2rem;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.75rem;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.filterLabel {
+  font-weight: 700;
+  color: #4b5563;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.checkbox label {
+  color: #374151;
+  font-size: 0.95rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* --- KHU VỰC GRID SÁCH --- */
+.content {
+  flex: 1;
+  min-width: 0; 
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.header h1 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 1.5rem;
+}
+
+.sortSelect {
+  padding: 0.6rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: white;
+  outline: none;
+  font-size: 0.95rem;
+  color: #374151;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.emptyState {
+  background: white;
+  padding: 4rem 2rem;
+  text-align: center;
+  border-radius: 12px;
+  color: #6b7280;
+  font-size: 1.1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+  border-color: #e5e7eb;
+}
+
+.card img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  border: 1px solid #f3f4f6;
+}
+
+.card h4 {
+  margin: 0 0 0.5rem 0;
+  color: #1f2937;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  /* Chống tràn dòng */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card p {
+  margin: 0 0 0.75rem 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+  flex-grow: 1;
+}
+
+.rating {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2563eb;
+  background-color: #eff6ff;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  align-self: flex-start;
+}
+
+/* --- PHÂN TRANG --- */
+.pagination {
+  margin-top: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.pages {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pages button {
+  width: 38px;
+  height: 38px;
+  border: 1px solid #d1d5db;
+  background: white;
+  border-radius: 8px;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.pages button:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.pages button.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+/* --- ĐÁP ỨNG THIẾT BỊ DI ĐỘNG --- */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    position: static;
+  }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .sortSelect {
+    width: 100%;
+  }
+}

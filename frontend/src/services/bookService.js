@@ -76,3 +76,9 @@ export const fetchPopularBooks = async () => {
   const response = await api.get('/books/popular');
   return response.data.data;
 };
+
+export const fetchFilteredBooks = async (queryString) => {
+  // queryString sẽ có dạng: category=1&sort=newest&page=1&limit=12
+  const response = await api.get(`/books/all?${queryString}`);
+  return response.data; // Trả về { success: true, books: [...], total: X, totalPages: Y }
+};
