@@ -1,4 +1,5 @@
 const { Sach, TacGia, TheLoai, ViTriLuuTru, sequelize } = require('../models');
+const { Op } = require('sequelize');
 
 class BookService {
   // 1. Lấy danh sách toàn bộ sách
@@ -128,6 +129,58 @@ class BookService {
       order: [[sequelize.literal('"LuotMuon"'), 'DESC']], // Xếp từ mượn nhiều đến ít
       limit: limit
     });
+  }
+
+  // Lấy danh sách sách có phân trang và bộ lọc
+  async getFilteredBooks(filters) {
+    const { category, year, status, sort, page = 1, limit = 12 } = filters;
+    const offset = (page - 1) * limit;
+
+    let whereCondition = {};
+    let includeCondition = [
+      { model: TacGia, as: 'tacGia', attributes: ['TenTacGia'] },
+      { 
+        model: TheLoai, 
+        as: 'theLoais', 
+        attributes: ['TenTheLoai'],
+        through: { attributes: [] },
+        // Chỉ thêm where nếu người dùng có chọn category
+        ...(category ? { where: { IDTheLoai: category } } : {})
+      }
+    ];
+
+    // Lọc theo trạng thái (Sẵn có: SoLuongSanSang > 0)
+    if (status === 'available') {
+      whereCondition.SoLuongSanSang = { [Op.gt]: 0 };
+    }
+
+    // Xử lý sắp xếp
+    let order = [['createdAt', 'DESC']];
+    if (sort === 'rating') order = [[sequelize.literal('"LuotMuon"'), 'DESC']]; 
+
+    const { count, rows } = await Sach.findAndCountAll({
+      where: whereCondition,
+      include: includeCondition,
+      // BỔ SUNG ĐOẠN NÀY: Tính toán cột ảo LuotMuon cho mỗi đầu sách
+      attributes: {
+        include: [
+          [
+            sequelize.literal(`(
+              SELECT COUNT(*)::int
+              FROM "CT_PhieuMuons" AS ct
+              WHERE ct."IDSach" = "Sach"."IDSach"
+            )`),
+            'LuotMuon'
+          ]
+        ]
+      },
+      order: order,
+      limit: parseInt(limit, 10),
+      offset: parseInt(offset, 10),
+      distinct: true // Tránh đếm sai tổng số sách khi join với bảng thể loại (n-n)
+    });
+
+    return { total: count, books: rows, totalPages: Math.ceil(count / limit) };
   }
 }
 
