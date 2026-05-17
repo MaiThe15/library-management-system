@@ -17,6 +17,8 @@ router.post(
   bookController.createBook
 );
 
+router.get('/search', bookController.searchBooks);
+
 // Route bảo mật: Cập nhật sách (có hỗ trợ đổi ảnh)
 router.put(
   '/:id', 

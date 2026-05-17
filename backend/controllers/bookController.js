@@ -1,5 +1,6 @@
 const bookService = require('../services/bookService');
-const { TacGia, ViTriLuuTru, TheLoai } = require('../models');
+const { TacGia, ViTriLuuTru, TheLoai, Sach } = require('../models');
+const { Op } = require('sequelize');
 
 exports.getAllBooks = async (req, res) => {
   try {
@@ -102,5 +103,35 @@ exports.getBookById = async (req, res) => {
     return res.status(200).json({ data: book });
   } catch (error) {
     return res.status(500).json({ message: error.message });
+  }
+};
+
+exports.searchBooks = async (req, res) => {
+  try {
+    const { q } = req.query; // Lấy từ khóa từ query string (VD: /search?q=harry)
+    
+    if (!q) {
+      return res.status(400).json({ success: false, message: 'Vui lòng nhập từ khóa tìm kiếm.' });
+    }
+
+    const books = await Sach.findAll({
+      where: {
+        // Tìm kiếm linh hoạt theo Tên sách
+        [Op.or]: [
+          { TenSach: { [Op.like]: `%${q}%` } },
+          // Nếu bạn có trường ISBN trong DB, có thể mở comment dòng dưới:
+          // { ISBN: { [Op.like]: `%${q}%` } }
+        ]
+      },
+      include: [
+        { model: TacGia, as: 'tacGia' },
+        { model: TheLoai, as: 'theLoais' } // Nhớ khớp tên alias 'as' với file model index.js của bạn
+      ]
+    });
+
+    return res.status(200).json({ success: true, data: books });
+  } catch (error) {
+    console.error('Lỗi tìm kiếm sách:', error);
+    return res.status(500).json({ success: false, message: 'Lỗi server khi tìm kiếm sách.' });
   }
 };
