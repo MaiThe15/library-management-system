@@ -37,3 +37,12 @@ export const fetchBookById = async (id) => {
   const response = await api.get(`/books/${id}`);
   return response.data.data;
 };
+
+export const searchBooksAPI = async (keyword) => {
+  try {
+    const response = await api.get(`/books/search?q=${keyword}`);
+    return response.data.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Lỗi khi tìm kiếm sách');
+  }
+};

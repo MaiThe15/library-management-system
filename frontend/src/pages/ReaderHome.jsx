@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { fetchAllBooks } from '../services/bookService';
+import { fetchAllBooks, searchBooksAPI } from '../services/bookService';
 import styles from './ReaderHome.module.css';
 import Navbar from '../components/Navbar';
 
@@ -9,6 +9,11 @@ const ReaderHome = () => {
   const user = JSON.parse(localStorage.getItem('user'));
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // States phục vụ tính năng tìm kiếm
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     const getBooks = async () => {
@@ -23,6 +28,26 @@ const ReaderHome = () => {
     };
     getBooks();
   }, []);
+
+  // Xử lý khi bấm nút "Tìm kiếm" hoặc nhấn Enter
+  const handleSearch = async (e) => {
+    e?.preventDefault(); // Chặn reload trang nếu bọc trong form
+    if (!searchQuery.trim()) {
+      setSearchResults(null); // Trở về trạng thái màn hình chính
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const results = await searchBooksAPI(searchQuery);
+      setSearchResults(results);
+    } catch (error) {
+      console.error(error);
+      alert('Có lỗi xảy ra khi tìm kiếm.');
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -46,14 +71,69 @@ const ReaderHome = () => {
         <div className={styles['hero-content']}>
           <h1>Khám phá kho tàng tri thức<br/>vô tận</h1>
           <p>Tìm kiếm hàng ngàn cuốn sách, tài liệu học thuật và tiểu thuyết mới nhất từ khắp nơi trên thế giới.</p>
-          <div className={styles['hero-content']}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" placeholder="Nhập tên sách, tác giả hoặc mã ISBN..." />
-            <button className={styles['btn-search']}>Tìm kiếm</button>
-          </div>
+          {/* thanh tìm kiếm */}
+          <form className={styles['search-bar']} onSubmit={handleSearch} style={{ display: 'flex', gap: '10px', background: 'white', padding: '10px', borderRadius: '8px', marginTop: '20px' }}>
+             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" style={{ margin: 'auto 10px' }}>
+               <circle cx="11" cy="11" r="8"></circle>
+               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+             </svg>
+            <input 
+              type="text" 
+              placeholder="Nhập tên sách..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ flex: 1, border: 'none', outline: 'none', fontSize: '1rem' }}
+            />
+            <button type="submit" className={styles['btn-search']} disabled={isSearching}>
+              {isSearching ? 'Đang tìm...' : 'Tìm kiếm'}
+            </button>
+          </form>
+          {/* Nút xóa từ khóa nếu đang có kết quả tìm kiếm */}
+          {searchResults !== null && (
+             <button 
+               onClick={() => { setSearchQuery(''); setSearchResults(null); }} 
+               style={{ marginTop: '10px', background: 'transparent', color: 'white', border: '1px solid white', padding: '5px 15px', borderRadius: '5px', cursor: 'pointer' }}
+             >
+               Quay lại danh sách nổi bật
+             </button>
+          )}
         </div>
       </section>
-
+      {/* RENDER KẾT QUẢ TÌM KIẾM NẾU CÓ, NẾU KHÔNG THÌ RENDER SÁCH MẶC ĐỊNH */}
+      {searchResults !== null ? (
+        <section className={styles['content-section']}>
+          <div className={styles['section-header']}>
+            <h2>Kết quả tìm kiếm cho: "{searchQuery}"</h2>
+          </div>
+          
+          {searchResults.length === 0 ? (
+            <p style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>Không tìm thấy sách nào phù hợp với từ khóa của bạn.</p>
+          ) : (
+            <div className={styles['books-row']}>
+              {searchResults.map((book) => (
+                <div 
+                  className={styles['book-card-modern']} 
+                  key={book.IDSach}
+                  onClick={() => navigate(`/book/${book.IDSach}`)} 
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className={styles['book-image-wrapper']}>
+                    <img 
+                      src={`http://localhost:5000${book.AnhBia}`} 
+                      alt={book.TenSach} 
+                      onError={(e) => { e.target.src = 'https://via.placeholder.com/180x260' }} 
+                    />
+                  </div>
+                  <div className={styles['book-card-info']}>
+                    <h4 title={book.TenSach}>{book.TenSach}</h4>
+                    <p className={styles.author}>{book.tacGia?.TenTacGia || 'Đang cập nhật'}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      ) : (<>
       {/* 3. SÁCH MỚI NHẬP */}
       <section className={styles['content-section']}>
         <div className={styles['section-header']}>
@@ -127,6 +207,8 @@ const ReaderHome = () => {
           ))}
         </div>
       </section>
+      </>)}
+
 
       {/* 5. FOOTER */}
       <footer className={styles["main-footer"]}>
