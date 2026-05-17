@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { fetchAllBooks, searchBooksAPI } from '../services/bookService';
+import { fetchAllBooks, searchBooksAPI, fetchNewestBooks, fetchPopularBooks } from '../services/bookService';
 import styles from './ReaderHome.module.css';
 import Navbar from '../components/Navbar';
 
 const ReaderHome = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
-  const [books, setBooks] = useState([]);
+  // const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // States phục vụ tính năng tìm kiếm
@@ -15,19 +15,41 @@ const ReaderHome = () => {
   const [searchResults, setSearchResults] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
 
+  const [newBooks, setNewBooks] = useState([]);
+  const [popularBooks, setPopularBooks] = useState([]);
+
   useEffect(() => {
-    const getBooks = async () => {
+    const getHomeData = async () => {
       try {
-        const data = await fetchAllBooks();
-        setBooks(data);
+        // Chạy song song cả 2 API để tối ưu tốc độ phản hồi trang chủ
+        const [newestData, popularData] = await Promise.all([
+          fetchNewestBooks(),
+          fetchPopularBooks()
+        ]);
+        setNewBooks(newestData);
+        setPopularBooks(popularData);
       } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu sách:", error);
+        console.error("Lỗi khi tải dữ liệu trang chủ:", error);
       } finally {
         setLoading(false);
       }
     };
-    getBooks();
+    getHomeData();
   }, []);
+
+  // useEffect(() => {
+  //   const getBooks = async () => {
+  //     try {
+  //       const data = await fetchAllBooks();
+  //       setBooks(data);
+  //     } catch (error) {
+  //       console.error("Lỗi khi lấy dữ liệu sách:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   getBooks();
+  // }, []);
 
   // Xử lý khi bấm nút "Tìm kiếm" hoặc nhấn Enter
   const handleSearch = async (e) => {
@@ -55,10 +77,10 @@ const ReaderHome = () => {
   };
 
   // Lấy ra 5 cuốn sách đầu tiên cho phần "Sách mới nhập"
-  const newBooks = books.slice(0, 5);
+  // const newBooks = books.slice(0, 5);
   
   // Tạm thời lấy 3 cuốn làm dữ liệu giả lập cho "Sách mượn nhiều nhất"
-  const popularBooks = books.slice(0, 3);
+  // const popularBooks = books.slice(0, 3);
 
   return (
     <div className={styles['reader-layout']}>
@@ -182,30 +204,40 @@ const ReaderHome = () => {
           </div>
         </div>
 
-        <div className={styles["popular-list"]}>
-          {popularBooks.map((book, index) => (
-            <div className={styles["popular-item"]} key={book.IDSach}>
-              <div className={styles["rank"]}>0{index + 1}</div>
-              <img 
-                src={`http://localhost:5000${book.AnhBia}`} 
-                alt={book.TenSach} 
-                className={styles['tiny-cover']} 
-                onError={(e) => { e.target.src = 'https://via.placeholder.com/40x55' }}
-              />
-              <div className={styles["popular-info"]}>
-                <h4>{book.TenSach}</h4>
-                <p>{book.tacGia?.TenTacGia || 'Đang cập nhật'}</p>
+        {loading ? <p>Đang tải dữ liệu...</p> : (
+              <div className={styles["popular-list"]}>
+                {popularBooks.map((book, index) => (
+                  <div className={styles["popular-item"]} key={book.IDSach}>
+                    <div className={styles["rank"]}>0{index + 1}</div>
+                    <img 
+                      src={`http://localhost:5000${book.AnhBia}`} 
+                      alt={book.TenSach} 
+                      className={styles['tiny-cover']} 
+                      onError={(e) => { e.target.src = 'https://via.placeholder.com/40x55' }}
+                    />
+                    <div className={styles["popular-info"]}>
+                      <h4 style={{ cursor: 'pointer' }} onClick={() => navigate(`/book/${book.IDSach}`)}>{book.TenSach}</h4>
+                      <p>{book.tacGia?.TenTacGia || 'Đang cập nhật'}</p>
+                    </div>
+                    <div className={styles["popular-stats"]}>
+                      {/* Hiển thị số lượt xem động */}
+                      <span className={styles["stat"]}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> 
+                        {book.LuotMuon}
+                      </span>
+                      {/* Hiển thị số lượt mượn thực tế lấy ra từ database */}
+                      <span className={styles["stat"]}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> 
+                        {book.SoLuongSanSang}
+                      </span>
+                    </div>
+                    <button className={styles["btn-icon"]} onClick={() => navigate(`/book/${book.IDSach}`)}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </button>
+                  </div>
+                ))}
               </div>
-              <div className={styles["popular-stats"]}>
-                <span className={styles["stat"]}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> 1,204</span>
-                <span className={styles["stat"]}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> 850</span>
-              </div>
-              <button className={styles["btn-icon"]}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-              </button>
-            </div>
-          ))}
-        </div>
+            )}
       </section>
       </>)}
 

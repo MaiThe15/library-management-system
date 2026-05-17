@@ -46,3 +46,33 @@ export const searchBooksAPI = async (keyword) => {
     throw new Error(error.response?.data?.message || 'Lỗi khi tìm kiếm sách');
   }
 };
+
+// Lấy toàn bộ đánh giá của sách
+export const fetchBookReviews = async (idSach) => {
+  const response = await api.get(`/books/${idSach}/reviews`);
+  return response.data.data;
+};
+
+// Kiểm tra xem độc giả có quyền đánh giá sách này không
+export const checkReviewEligibility = async (idSach) => {
+  const response = await api.get(`/books/${idSach}/review-eligibility`);
+  return response.data; // Trả về dạng { success: true, canReview: true/false, reason: '...' }
+};
+
+// Đăng bài đánh giá mới lên hệ thống
+export const createBookReview = async (idSach, reviewData) => {
+  const response = await api.post(`/books/${idSach}/reviews`, reviewData);
+  return response.data;
+};
+
+// Lấy 5 cuốn mới nhất
+export const fetchNewestBooks = async () => {
+  const response = await api.get('/books/newest');
+  return response.data.data;
+};
+
+// Lấy 3 cuốn mượn nhiều nhất
+export const fetchPopularBooks = async () => {
+  const response = await api.get('/books/popular');
+  return response.data.data;
+};
