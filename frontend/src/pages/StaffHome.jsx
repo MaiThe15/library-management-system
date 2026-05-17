@@ -5,6 +5,7 @@ import styles from './StaffHome.module.css';
 import BorrowManagement from '../components/BorrowManagement';
 import BookManagement from '../components/BookManagement';
 import ReaderManagement from '../components/ReaderManagement';
+import InventoryManagement from '../components/InventoryManagement';
 
 const StaffHome = () => {
   const navigate = useNavigate();
@@ -103,7 +104,7 @@ const StaffHome = () => {
         </header>
 
         <div className={styles.workspace}>
-          {/* TAB 1: QUẢN LÝ DANH MỤC SÁCH */}
+          {/* TAB 1: QUẢN LÝ KHO*/}
           {activeTab === 'quan-ly-danh-muc' && (
             <BookManagement 
               books={books} 
@@ -112,8 +113,11 @@ const StaffHome = () => {
               onRefreshBooks={initData} 
             />
           )}
+          {activeTab === 'nhap-xuat-sach' && (
+            <InventoryManagement />
+          )}
 
-          {/* TAB 2: QUẢN LÝ MƯỢN TRẢ SÁCH */}
+          {/* TAB 2: THỦ THƯ */}
           {activeTab === 'quan-ly-muon-tra' && (
             <BorrowManagement books={books} />
           )}
@@ -122,15 +126,6 @@ const StaffHome = () => {
             <ReaderManagement />
           )}
 
-          {/* CÁC PHÂN HỆ CHỜ TÍCH HỢP KHÁC */}
-          {activeTab !== 'quan-ly-danh-muc' && activeTab !== 'quan-ly-muon-tra'
-          && activeTab !== 'thong-tin-doc-gia'
-          && (
-            <div className={styles.emptyFeature}>
-              <h3>Hệ thống đang kết nối dữ liệu...</h3>
-              <p>Màn hình nghiệp vụ của phân hệ <strong>"{activeTab}"</strong> đang chờ tích hợp logic APIs ở các bước sau.</p>
-            </div>
-          )}
         </div>
       </main>
     </div>
