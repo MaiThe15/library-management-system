@@ -5,6 +5,12 @@ module.exports = (sequelize, DataTypes) => {
   class VaiTro extends Model {
     static associate(models) {
       VaiTro.hasMany(models.NhanVien, { foreignKey: 'IDVaiTro', as: 'nhanViens' });
+      VaiTro.belongsToMany(models.Quyen, { 
+          through: 'VaiTro_Quyen', 
+          foreignKey: 'IDVaiTro', 
+          otherKey: 'IDQuyen',
+          as: 'quyens' 
+      });
     }
   }
   VaiTro.init({

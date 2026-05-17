@@ -5,6 +5,7 @@ const authRoutes = require('./routes/authRoutes');
 const bookRoutes = require('./routes/bookRoutes');
 const phieuMuonRoutes = require('./routes/phieuMuonRoutes');
 const docGiaRoutes = require('./routes/docGiaRoutes');
+const phieuKhoRoutes = require('./routes/phieuKhoRoutes');
 const path = require('path');
 
 const app = express();
@@ -25,6 +26,8 @@ app.use('/api/books', bookRoutes);
 app.use('/api/phieumuon', phieuMuonRoutes);
 
 app.use('/api/docgia', docGiaRoutes);
+
+app.use('/api/phieu-kho', phieuKhoRoutes);
 
 // Khởi chạy server
 const PORT = process.env.PORT || 5000;
