@@ -135,3 +135,21 @@ exports.searchBooks = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Lỗi server khi tìm kiếm sách.' });
   }
 };
+
+exports.getNewestBooks = async (req, res) => {
+  try {
+    const books = await bookService.getNewestBooks(5);
+    return res.status(200).json({ success: true, data: books });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getPopularBooks = async (req, res) => {
+  try {
+    const books = await bookService.getPopularBooks(3);
+    return res.status(200).json({ success: true, data: books });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};

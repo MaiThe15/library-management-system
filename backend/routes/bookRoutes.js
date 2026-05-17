@@ -3,6 +3,7 @@ const router = express.Router();
 const bookController = require('../controllers/bookController');
 const { verifyToken, checkRole } = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadMiddleware');
+const danhGiaController = require('../controllers/danhGiaController');
 
 // Route công khai: Lấy danh sách sách
 router.get('/', bookController.getAllBooks);
@@ -18,6 +19,9 @@ router.post(
 );
 
 router.get('/search', bookController.searchBooks);
+
+router.get('/newest', bookController.getNewestBooks);
+router.get('/popular', bookController.getPopularBooks);
 
 // Route bảo mật: Cập nhật sách (có hỗ trợ đổi ảnh)
 router.put(
@@ -38,5 +42,12 @@ router.delete(
 
 // Route công khai: Xem chi tiết 1 cuốn sách
 router.get('/:id', bookController.getBookById);
+
+// Lấy danh sách đánh giá (Mọi người đều xem được)
+router.get('/:id/reviews', danhGiaController.getBookReviews);
+// Kiểm tra quyền được viết đánh giá (Phải đăng nhập)
+router.get('/:id/review-eligibility', verifyToken, danhGiaController.checkReviewEligibility);
+// Gửi bài viết đánh giá (Phải đăng nhập và là Độc giả)
+router.post('/:id/reviews', verifyToken, checkRole(['DOC_GIA']), danhGiaController.createReview);
 
 module.exports = router;

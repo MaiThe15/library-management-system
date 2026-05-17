@@ -1,4 +1,4 @@
-const { Sach, TacGia, TheLoai, ViTriLuuTru } = require('../models');
+const { Sach, TacGia, TheLoai, ViTriLuuTru, sequelize } = require('../models');
 
 class BookService {
   // 1. Lấy danh sách toàn bộ sách
@@ -92,6 +92,42 @@ class BookService {
     // Sequelize sẽ tự động xóa các bản ghi liên quan trong bảng trung gian TheLoai_Sachs nhờ onDelete: 'CASCADE'
     await book.destroy();
     return true;
+  }
+
+  // Lấy danh sách 5 cuốn sách mới nhập nhất
+  async getNewestBooks(limit = 5) {
+    return await Sach.findAll({
+      include: [
+        { model: TacGia, as: 'tacGia', attributes: ['TenTacGia'] },
+        { model: TheLoai, as: 'theLoais', attributes: ['TenTheLoai'], through: { attributes: [] } }
+      ],
+      order: [['createdAt', 'DESC']], // Sắp xếp theo ngày tạo giảm dần
+      limit: limit
+    });
+  }
+
+  // Lấy danh sách 3 cuốn sách được mượn nhiều nhất
+  async getPopularBooks(limit = 3) {
+    return await Sach.findAll({
+      attributes: {
+        include: [
+          [
+            // Đếm số lượt xuất hiện của đầu sách này trong bảng chi tiết phiếu mượn
+            sequelize.literal(`(
+              SELECT COUNT(*)::int
+              FROM "CT_PhieuMuons" AS ct
+              WHERE ct."IDSach" = "Sach"."IDSach"
+            )`),
+            'LuotMuon'
+          ]
+        ]
+      },
+      include: [
+        { model: TacGia, as: 'tacGia', attributes: ['TenTacGia'] }
+      ],
+      order: [[sequelize.literal('"LuotMuon"'), 'DESC']], // Xếp từ mượn nhiều đến ít
+      limit: limit
+    });
   }
 }
 

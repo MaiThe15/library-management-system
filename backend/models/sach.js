@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         as: 'theLoais' 
       });
       Sach.hasMany(models.CT_PhieuMuon, { foreignKey: 'IDSach', as: 'chiTietPhieuMuons' });
+      Sach.hasMany(models.DanhGia, { foreignKey: 'IDSach', as: 'danhGias' });
     }
   }
   Sach.init({
