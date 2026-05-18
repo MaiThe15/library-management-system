@@ -39,3 +39,11 @@ exports.getThongKeTaiChinh = async () => {
         doanhThuThuan: tongThu - tongChi
     };
 };
+
+// Lấy danh sách hóa đơn theo ID Độc giả
+exports.getHoaDonByDocGia = async (idDocGia) => {
+    return await HoaDon.findAll({
+        where: { IDDocGia: idDocGia },
+        order: [['createdAt', 'DESC']]
+    });
+};

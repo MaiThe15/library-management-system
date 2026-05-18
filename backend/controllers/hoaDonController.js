@@ -31,3 +31,16 @@ exports.getFinancialSummary = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 };
+
+exports.getMyInvoices = async (req, res) => {
+    try {
+        const idDocGia = req.user.IDDocGia; 
+        if (!idDocGia) {
+            return res.status(403).json({ success: false, message: 'Tài khoản không có quyền độc giả.' });
+        }
+        const invoices = await hoaDonService.getHoaDonByDocGia(idDocGia);
+        return res.status(200).json({ success: true, data: invoices });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};

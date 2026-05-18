@@ -3,17 +3,14 @@ const router = express.Router();
 const hoaDonController = require('../controllers/hoaDonController');
 const { verifyToken, checkRole } = require('../middlewares/authMiddleware');
 
-// Tất cả các tính năng tài chính yêu cầu quyền NHAN_VIEN (Cụ thể là bộ phận Kế toán)
-router.use(verifyToken);
-router.use(checkRole(['NHAN_VIEN']));
+router.use(verifyToken); // Bắt buộc đăng nhập cho tất cả route bên dưới
 
-// Lấy danh sách hóa đơn
-router.get('/', hoaDonController.getInvoices);
+// --- CÁC ROUTE CỦA KẾ TOÁN (NHAN_VIEN) ---
+router.get('/', checkRole(['NHAN_VIEN']), hoaDonController.getInvoices);
+router.get('/thong-ke', checkRole(['NHAN_VIEN']), hoaDonController.getFinancialSummary);
+router.put('/:id/pay', checkRole(['NHAN_VIEN']), hoaDonController.payInvoice);
 
-// Lấy báo cáo doanh thu tổng hợp
-router.get('/thong-ke', hoaDonController.getFinancialSummary);
-
-// Xác nhận thanh toán hóa đơn cụ thể
-router.put('/:id/pay', hoaDonController.payInvoice);
+// --- ROUTE MỚI CỦA ĐỘC GIẢ (DOC_GIA) ---
+router.get('/my-invoices', checkRole(['DOC_GIA']), hoaDonController.getMyInvoices);
 
 module.exports = router;
