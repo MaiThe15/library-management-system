@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { fetchMyBorrowHistory } from '../services/phieuMuonService';
 import { updateReaderProfile } from '../services/docGiaService';
+import { fetchMyInvoices } from '../services/hoaDonService';
 import styles from './ReaderAccount.module.css';
 
 const ReaderAccount = () => {
+  const PHI_PHAT_MOI_NGAY = 5000;
+
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const [borrowHistory, setBorrowHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,6 +21,8 @@ const ReaderAccount = () => {
   });
   const [message, setMessage] = useState({ type: '', text: '' });
 
+  const [myInvoices, setMyInvoices] = useState([]);
+
   useEffect(() => {
     const getHistory = async () => {
       try {
@@ -30,7 +35,37 @@ const ReaderAccount = () => {
       }
     };
     getHistory();
+
+    const loadInvoices = async () => {
+        try {
+            const data = await fetchMyInvoices();
+            setMyInvoices(data);
+        } catch (error) {
+            console.error("Lỗi khi tải hóa đơn cá nhân:", error);
+        }
+    };
+    loadInvoices();
   }, []);
+
+  const unpaidInvoices = myInvoices.filter(inv => inv.TrangThai === 'Chưa thanh toán');
+  const invoiceDebt = unpaidInvoices.reduce((sum, inv) => sum + inv.SoTien, 0);
+
+  const activeOverdueDebt = borrowHistory.reduce((sum, slip) => {
+    if (slip.TrangThai === 'Đang mượn') {
+        const ngayHienTai = new Date();
+        const hanTra = new Date(slip.HanTra);
+        
+        // Nếu đã quá hạn trả
+        if (ngayHienTai > hanTra) {
+            const timeDiff = ngayHienTai.getTime() - hanTra.getTime();
+            const soNgayTre = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Quy đổi ra số ngày
+            return sum + (soNgayTre * PHI_PHAT_MOI_NGAY);
+        }
+    }
+    return sum;
+  }, 0);
+
+  const totalDebt = invoiceDebt + activeOverdueDebt;
 
   // Xử lý thay đổi dữ liệu trong ô input
   const handleInputChange = (e) => {
@@ -145,6 +180,29 @@ const ReaderAccount = () => {
             </form>
           )}
         </section>
+
+        {/* --- BANNER CẢNH BÁO NỢ PHẠT --- */}
+        {unpaidInvoices.length > 0 && (
+            <div style={{
+                backgroundColor: '#fef2f2', 
+                borderLeft: '5px solid #ef4444', 
+                padding: '15px 20px', 
+                marginBottom: '20px',   
+                borderRadius: '8px',
+                boxShadow: '0 2px 4px rgba(239, 68, 68, 0.1)'
+            }}>
+                <h3 style={{ color: '#b91c1c', margin: '0 0 10px 0', display: 'flex', alignItems: 'center' }}>
+                    Cảnh báo nợ phí thư viện!
+                </h3>
+                <p style={{ margin: '5px 0', color: '#7f1d1d' }}>
+                    Bạn hiện đang có <strong>{unpaidInvoices.length}</strong> hóa đơn chưa thanh toán. 
+                    Tổng số tiền cần nộp: <strong style={{ fontSize: '1.2rem' }}>{totalDebt.toLocaleString('vi-VN')} VNĐ</strong>.
+                </p>
+                <p style={{ margin: '0', color: '#7f1d1d', fontSize: '0.9rem' }}>
+                    Vui lòng đến quầy Kế toán hoặc gặp Thủ thư để hoàn tất thanh toán, tránh việc tài khoản bị khóa tính năng mượn sách.
+                </p>
+            </div>
+        )}
 
         {/* LỊCH SỬ MƯỢN SÁCH (Giữ nguyên như đã thiết kế) */}
         <section className={styles['history-section']}>

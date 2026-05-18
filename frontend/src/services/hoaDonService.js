@@ -14,3 +14,8 @@ export const payInvoice = async (id) => {
     const response = await axios.put(`/hoa-don/${id}/pay`);
     return response.data;
 };
+
+export const fetchMyInvoices = async () => {
+    const response = await axios.get('/hoa-don/my-invoices');
+    return response.data.data; 
+};
