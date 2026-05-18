@@ -1,17 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const phieuMuonController = require('../controllers/phieuMuonController');
-const { verifyToken, isLibrarian } = require('../middlewares/authMiddleware'); // Giả định bạn có middleware phân quyền
 
-// Route lấy danh sách phiếu mượn
-router.get('/', phieuMuonController.getAllBorrowSlips);
+// Import đúng tên hàm từ authMiddleware của bạn
+const { verifyToken, checkRole } = require('../middlewares/authMiddleware'); 
 
-// Route chỉ dành cho Thủ thư (hoặc nhân viên có quyền)
-router.post('/create', verifyToken, phieuMuonController.createBorrowSlip);
+// 1. Route lấy danh sách phiếu mượn (Nên bảo vệ, chỉ Nhân viên mới được xem toàn bộ)
+router.get('/', verifyToken, checkRole(['NHAN_VIEN']), phieuMuonController.getAllBorrowSlips);
 
-router.put('/:id/return', phieuMuonController.returnBorrowSlip);
+// 2. Route tạo phiếu mượn (Chỉ dành cho Nhân viên)
+router.post('/create', verifyToken, checkRole(['NHAN_VIEN']), phieuMuonController.createBorrowSlip);
 
-// xem lịch sử mượn sách của phân hệ độc giả
-router.get('/my-history', verifyToken, phieuMuonController.getReaderHistory);
+// 3. Route xác nhận trả sách và xuất hóa đơn (CỰC KỲ QUAN TRỌNG: Phải có verifyToken)
+router.put('/:id/return', verifyToken, checkRole(['NHAN_VIEN']), phieuMuonController.returnBorrowSlip);
+
+// 4. Route xem lịch sử mượn sách cá nhân (Dành riêng cho phân hệ Độc giả)
+router.get('/my-history', verifyToken, checkRole(['DOC_GIA']), phieuMuonController.getReaderHistory);
 
 module.exports = router;

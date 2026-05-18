@@ -1,4 +1,7 @@
-const { sequelize, PhieuMuon, CT_PhieuMuon, Sach, DocGia, NhanVien } = require('../models');
+const { sequelize, PhieuMuon, CT_PhieuMuon, Sach, DocGia, NhanVien, HoaDon } = require('../models');
+
+const PHI_MUON_CO_BAN = 10000;
+const PHI_PHAT_MOI_NGAY = 5000;
 
 exports.taoPhieuMuon = async (data) => {
   const { idDocGia, idNhanVien, danhSachIdSach } = data;
@@ -84,7 +87,7 @@ exports.getAllBorrowSlips = async () => {
   });
 };
 
-exports.traPhieuMuon = async (idPhieuMuon) => {
+exports.traPhieuMuon = async (idPhieuMuon, idNhanVienThucHien) => {
   const t = await sequelize.transaction();
 
   try {
@@ -93,10 +96,24 @@ exports.traPhieuMuon = async (idPhieuMuon) => {
     if (!phieuMuon) throw new Error('Không tìm thấy phiếu mượn trong hệ thống.');
     if (phieuMuon.TrangThai === 'Đã trả') throw new Error('Phiếu mượn này đã được hoàn tất trả trước đó.');
 
-    // 2. Cập nhật trạng thái phiếu gốc
+    // 2. Tính toán tiền phí và tiền phạt
+    const ngayTraThucTe = new Date();
+    const hanTra = new Date(phieuMuon.HanTra);
+    let tienPhat = 0;
+    let soNgayTre = 0;
+
+    // Nếu trả muộn
+    if (ngayTraThucTe > hanTra) {
+        const timeDiff = ngayTraThucTe.getTime() - hanTra.getTime();
+        soNgayTre = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Tính số ngày
+        tienPhat = soNgayTre * PHI_PHAT_MOI_NGAY;
+    }
+    const tongTienThu = PHI_MUON_CO_BAN + tienPhat;
+
+    // 3. Cập nhật trạng thái phiếu gốc
     await phieuMuon.update({ TrangThai: 'Đã trả' }, { transaction: t });
 
-    // 3. Cập nhật chi tiết phiếu và HOÀN TRẢ SỐ LƯỢNG SÁCH
+    // 4. Cập nhật chi tiết phiếu và HOÀN TRẢ SỐ LƯỢNG SÁCH
     const chiTietPhieu = await CT_PhieuMuon.findAll({
       where: { IDPhieuMuon: idPhieuMuon },
       transaction: t
@@ -110,14 +127,39 @@ exports.traPhieuMuon = async (idPhieuMuon) => {
       const sach = await Sach.findByPk(ct.IDSach, { transaction: t });
       if (sach) {
         await sach.update({
-          SoLuongSanSang: sach.SoLuongSanSang + 1
+          SoLuongSanSang: sach.SoLuongSanSang + 1,
+          TrangThai: 'CO_SAN'
         }, { transaction: t });
       }
     }
 
+    // 5. Lập Hóa Đơn Thu cho Kế toán
+    let lyDoThu = 'Thu phí mượn sách cơ bản';
+    if (tienPhat > 0) {
+        lyDoThu = `Thu phí mượn sách (${PHI_MUON_CO_BAN}đ) và Phạt trễ hạn ${soNgayTre} ngày (${tienPhat}đ)`;
+    }
+
+    const hoaDon = await HoaDon.create({
+        IDNhanVien: idNhanVienThucHien, // ID Nhân viên đang trực quầy xử lý việc trả sách
+        IDDocGia: phieuMuon.IDDocGia,
+        LoaiHoaDon: 'Thu',
+        LyDo: lyDoThu,
+        SoTien: tongTienThu,
+        TrangThai: 'Chưa thanh toán' 
+    }, { transaction: t });
+
     // Xác nhận lưu toàn bộ thay đổi
     await t.commit();
-    return phieuMuon;
+    return {
+        phieuMuon,
+        hoaDon,
+        chiTietToan: {
+            phiCoBan: PHI_MUON_CO_BAN,
+            soNgayTre,
+            tienPhat,
+            tongTien: tongTienThu
+        }
+    };
 
   } catch (error) {
     await t.rollback();

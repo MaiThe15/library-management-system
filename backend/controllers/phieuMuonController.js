@@ -46,11 +46,17 @@ exports.getAllBorrowSlips = async (req, res) => {
 exports.returnBorrowSlip = async (req, res) => {
   try {
     const idPhieuMuon = req.params.id;
-    const updatedSlip = await phieuMuonService.traPhieuMuon(idPhieuMuon);
+    const idNhanVien = req.user.IDNhanVien;
+
+    if (!idNhanVien) {
+      return res.status(403).json({ message: 'Chỉ nhân viên thư viện mới có quyền xử lý trả sách.' });
+    }
+
+    const result = await phieuMuonService.traPhieuMuon(idPhieuMuon, idNhanVien);
     
     return res.status(200).json({ 
       message: 'Xác nhận trả sách thành công! Kho đã được cập nhật.', 
-      data: updatedSlip 
+      data: result 
     });
   } catch (error) {
     return res.status(400).json({ message: error.message });
