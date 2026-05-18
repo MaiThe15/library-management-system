@@ -21,6 +21,9 @@ const BorrowManagement = ({ books }) => {
     return defaultReturn.toISOString().split('T')[0];
   });
 
+  // STATE MỚI: Quản lý hiển thị Popup Biên lai thu tiền
+  const [returnReceipt, setReturnReceipt] = useState(null);
+
   const loadBorrowSlips = async () => {
     try {
       setLoadingSlips(true);
@@ -93,10 +96,14 @@ const BorrowManagement = ({ books }) => {
   const handleReturnSlip = async (idPhieuMuon) => {
     if (window.confirm('Xác nhận độc giả đã trả đủ sách cho phiếu này?')) {
       try {
-        await returnBorrowSlip(idPhieuMuon);
-        alert('✅ Xác nhận trả sách thành công!');
+        // Lấy response từ service (đảm bảo service của bạn trả về res.data)
+        const response = await returnBorrowSlip(idPhieuMuon); 
+        
+        // Mở popup biên lai và truyền dữ liệu vào state
+        setReturnReceipt(response.data); 
+        
         loadBorrowSlips(); // Tải lại bảng để cập nhật trạng thái
-        // (Nếu bạn có truyền props onRefreshBooks từ component cha, hãy gọi ở đây để cập nhật lại số lượng sách kho)
+        // (gọi onRefreshBooks nếu có để cập nhật kho)
       } catch (error) {
         alert(`Lỗi: ${error.message}`);
       }
@@ -260,6 +267,55 @@ const BorrowManagement = ({ books }) => {
               </button>
               <button type="button" onClick={closeModalAndReset} className={styles.btnCancel}>
                 Đóng lại
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {returnReceipt && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent} style={{ maxWidth: '400px' }}>
+            <h3 className={styles.modalHeader} style={{ color: '#10b981', textAlign: 'center' }}>
+              ✅ Trả Sách Thành Công
+            </h3>
+            
+            <div style={{ padding: '15px', backgroundColor: '#f9fafb', borderRadius: '8px', margin: '15px 0' }}>
+              <p style={{ margin: '5px 0' }}><strong>Mã phiếu:</strong> #{returnReceipt.phieuMuon?.IDPhieuMuon}</p>
+              <p style={{ margin: '5px 0' }}><strong>Mã hóa đơn:</strong> #{returnReceipt.hoaDon?.IDHoaDon}</p>
+              
+              <hr style={{ margin: '10px 0', borderTop: '1px dashed #ccc' }} />
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 0' }}>
+                <span>Phí mượn cơ bản:</span>
+                <span>{returnReceipt.chiTietToan?.phiCoBan?.toLocaleString('vi-VN')} đ</span>
+              </div>
+
+              {returnReceipt.chiTietToan?.soNgayTre > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 0', color: '#ef4444' }}>
+                  <span>Phạt trễ hạn ({returnReceipt.chiTietToan?.soNgayTre} ngày):</span>
+                  <span>+ {returnReceipt.chiTietToan?.tienPhat?.toLocaleString('vi-VN')} đ</span>
+                </div>
+              )}
+
+              <hr style={{ margin: '10px 0', borderTop: '1px solid #ccc' }} />
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold' }}>
+                <span>Tổng cần thu:</span>
+                <span style={{ color: '#2563eb' }}>
+                  {returnReceipt.chiTietToan?.tongTien?.toLocaleString('vi-VN')} đ
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.modalActions} style={{ justifyContent: 'center' }}>
+              <button 
+                onClick={() => setReturnReceipt(null)} 
+                style={{
+                  backgroundColor: '#10b981', color: 'white', border: 'none', 
+                  padding: '10px 20px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', width: '100%'
+                }}
+              >
+                Xác nhận & Đóng
               </button>
             </div>
           </div>

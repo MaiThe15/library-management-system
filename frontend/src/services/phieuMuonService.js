@@ -2,7 +2,7 @@ import api from '../api/axios'; // Đổi tên thành api cho đồng nhất v�
 
 export const fetchAllBorrowSlips = async () => {
   try {
-    const response = await api.get('/phieumuon');
+    const response = await api.get('/phieu-muon');
     return response.data.data;
   } catch (error) {
     if (error.response && error.response.data) {
@@ -15,7 +15,7 @@ export const fetchAllBorrowSlips = async () => {
 export const createBorrowSlip = async (borrowData) => {
   try {
     // Lưu ý: Nếu api/axios.js đã cấu hình baseURL là '/api', bạn chỉ cần gọi '/phieumuon/create'
-    const response = await api.post('/phieumuon/create', borrowData);
+    const response = await api.post('/phieu-muon/create', borrowData);
     return response.data;
   } catch (error) {
     // Bắt và ném lỗi từ backend (ví dụ: lỗi 400 hết sách) để UI có thể hiển thị thông báo
@@ -28,7 +28,7 @@ export const createBorrowSlip = async (borrowData) => {
 
 export const returnBorrowSlip = async (id) => {
   try {
-    const response = await api.put(`/phieumuon/${id}/return`);
+    const response = await api.put(`/phieu-muon/${id}/return`);
     return response.data;
   } catch (error) {
     if (error.response && error.response.data) {
@@ -40,7 +40,7 @@ export const returnBorrowSlip = async (id) => {
 
 export const fetchMyBorrowHistory = async () => {
   try {
-    const response = await api.get('/phieumuon/my-history');
+    const response = await api.get('/phieu-muon/my-history');
     return response.data.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Không thể tải lịch sử mượn sách.');

@@ -6,6 +6,7 @@ import BorrowManagement from '../components/BorrowManagement';
 import BookManagement from '../components/BookManagement';
 import ReaderManagement from '../components/ReaderManagement';
 import InventoryManagement from '../components/InventoryManagement';
+import AccountingManagement from '../components/AccountingManagement';
 
 const StaffHome = () => {
   const navigate = useNavigate();
@@ -49,53 +50,65 @@ const StaffHome = () => {
         </div>
 
         <div className={styles.actorGroup}>
-          <div className={styles.actorTitle}>Bộ phận kho</div>
-          <button 
-            className={`${styles.navItem} ${activeTab === 'quan-ly-danh-muc' ? styles.navItemActive : ''}`}
-            onClick={() => setActiveTab('quan-ly-danh-muc')}
-          >
-            📦 Quản lý danh mục sách
-          </button>
-          <button 
-            className={`${styles.navItem} ${activeTab === 'quan-ly-ton-kho' ? styles.navItemActive : ''}`}
-            onClick={() => setActiveTab('quan-ly-ton-kho')}
-          >
-            📊 Quản lý tồn kho
-          </button>
-          <button 
-            className={`${styles.navItem} ${activeTab === 'nhap-xuat-sach' ? styles.navItemActive : ''}`}
-            onClick={() => setActiveTab('nhap-xuat-sach')}
-          >
-            🔄 Nhập / Xuất sách
-          </button>
-        </div>
-
-        <div className={styles.actorGroup}>
           <div className={styles.actorTitle}>Thủ thư</div>
           <button 
             className={`${styles.navItem} ${activeTab === 'quan-ly-muon-tra' ? styles.navItemActive : ''}`}
             onClick={() => setActiveTab('quan-ly-muon-tra')}
           >
-            📖 Quản lý mượn trả
+            Quản lý mượn trả
           </button>
           <button 
             className={`${styles.navItem} ${activeTab === 'thong-tin-doc-gia' ? styles.navItemActive : ''}`}
             onClick={() => setActiveTab('thong-tin-doc-gia')}
           >
-            👥 Thông tin độc giả
+            Thông tin độc giả
           </button>
         </div>
+
+        <div className={styles.actorGroup}>
+          <div className={styles.actorTitle}>Bộ phận kho</div>
+          <button 
+            className={`${styles.navItem} ${activeTab === 'quan-ly-danh-muc' ? styles.navItemActive : ''}`}
+            onClick={() => setActiveTab('quan-ly-danh-muc')}
+          >
+            Quản lý danh mục sách
+          </button>
+          <button 
+            className={`${styles.navItem} ${activeTab === 'quan-ly-ton-kho' ? styles.navItemActive : ''}`}
+            onClick={() => setActiveTab('quan-ly-ton-kho')}
+          >
+            Quản lý tồn kho
+          </button>
+          <button 
+            className={`${styles.navItem} ${activeTab === 'nhap-xuat-sach' ? styles.navItemActive : ''}`}
+            onClick={() => setActiveTab('nhap-xuat-sach')}
+          >
+            Nhập / Xuất sách
+          </button>
+        </div>
+
+        <div className={styles.actorGroup}>
+          <div className={styles.actorTitle}>Bộ phận kế toán</div>
+          <button 
+            className={`${styles.navItem} ${activeTab === 'quan-ly-hoa-don-thu' ? styles.navItemActive : ''}`}
+            onClick={() => setActiveTab('quan-ly-hoa-don-thu')}
+          >
+            Quản lý hóa đơn thu
+          </button>
+        </div>
+
       </aside>
 
       {/* KHU VỰC KHÔNG GIAN LÀM VIỆC CHÍNH */}
       <main className={styles.mainContent}>
         <header className={styles.topHeader}>
           <h2>
+            {activeTab === 'quan-ly-muon-tra' && 'Quản lý mượn trả sách'}
+            {activeTab === 'thong-tin-doc-gia' && 'Quản lý tài khoản độc giả'}
             {activeTab === 'quan-ly-danh-muc' && 'Quản lý danh mục sách'}
             {activeTab === 'quan-ly-ton-kho' && 'Báo cáo tồn kho chi tiết'}
             {activeTab === 'nhap-xuat-sach' && 'Lịch sử nhập xuất kho'}
-            {activeTab === 'quan-ly-muon-tra' && 'Quản lý mượn trả sách'}
-            {activeTab === 'thong-tin-doc-gia' && 'Quản lý tài khoản độc giả'}
+            {activeTab === 'quan-ly-hoa-don-thu' && 'Quản lý hóa đơn thu'}
           </h2>
           <div className={styles.userInfo}>
             <span>Nhân viên: <strong style={{ color: '#2563eb' }}>{user?.HoTen}</strong></span>
@@ -104,7 +117,16 @@ const StaffHome = () => {
         </header>
 
         <div className={styles.workspace}>
-          {/* TAB 1: QUẢN LÝ KHO*/}
+          {/* TAB 1: THỦ THƯ */}
+          {activeTab === 'quan-ly-muon-tra' && (
+            <BorrowManagement books={books} />
+          )}
+
+          {activeTab === 'thong-tin-doc-gia' && (
+            <ReaderManagement />
+          )}
+
+          {/* TAB 2: QUẢN LÝ KHO */}
           {activeTab === 'quan-ly-danh-muc' && (
             <BookManagement 
               books={books} 
@@ -117,13 +139,9 @@ const StaffHome = () => {
             <InventoryManagement />
           )}
 
-          {/* TAB 2: THỦ THƯ */}
-          {activeTab === 'quan-ly-muon-tra' && (
-            <BorrowManagement books={books} />
-          )}
-
-          {activeTab === 'thong-tin-doc-gia' && (
-            <ReaderManagement />
+          {/*  TAB 3: QUẢN LÝ KẾ TOÁN */}
+          {activeTab === 'quan-ly-hoa-don-thu' && (
+            <AccountingManagement />
           )}
 
         </div>
