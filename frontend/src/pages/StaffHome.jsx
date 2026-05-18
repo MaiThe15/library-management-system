@@ -7,6 +7,7 @@ import BookManagement from '../components/BookManagement';
 import ReaderManagement from '../components/ReaderManagement';
 import InventoryManagement from '../components/InventoryManagement';
 import AccountingManagement from '../components/AccountingManagement';
+import ManagerDashboard from '../components/ManagerDashboard';
 
 const StaffHome = () => {
   const navigate = useNavigate();
@@ -97,6 +98,16 @@ const StaffHome = () => {
           </button>
         </div>
 
+        <div className={styles.actorGroup}>
+          <div className={styles.actorTitle}>Quản lý</div>
+          <button 
+            className={`${styles.navItem} ${activeTab === 'thong-ke' ? styles.navItemActive : ''}`}
+            onClick={() => setActiveTab('thong-ke')}
+          >
+            Thống kê
+          </button>
+        </div>
+
       </aside>
 
       {/* KHU VỰC KHÔNG GIAN LÀM VIỆC CHÍNH */}
@@ -109,6 +120,7 @@ const StaffHome = () => {
             {activeTab === 'quan-ly-ton-kho' && 'Báo cáo tồn kho chi tiết'}
             {activeTab === 'nhap-xuat-sach' && 'Lịch sử nhập xuất kho'}
             {activeTab === 'quan-ly-hoa-don-thu' && 'Quản lý hóa đơn thu'}
+            {activeTab === 'thong-ke' && 'Thống kê'}
           </h2>
           <div className={styles.userInfo}>
             <span>Nhân viên: <strong style={{ color: '#2563eb' }}>{user?.HoTen}</strong></span>
@@ -126,7 +138,7 @@ const StaffHome = () => {
             <ReaderManagement />
           )}
 
-          {/* TAB 2: QUẢN LÝ KHO */}
+          {/* TAB 2: BỘ PHẬN KHO */}
           {activeTab === 'quan-ly-danh-muc' && (
             <BookManagement 
               books={books} 
@@ -139,9 +151,14 @@ const StaffHome = () => {
             <InventoryManagement />
           )}
 
-          {/*  TAB 3: QUẢN LÝ KẾ TOÁN */}
+          {/*  TAB 3: BỘ PHẬN KẾ TOÁN */}
           {activeTab === 'quan-ly-hoa-don-thu' && (
             <AccountingManagement />
+          )}
+
+          {/*  TAB 4: QUẢN LÝ */}
+          {activeTab === 'thong-ke' && (
+            <ManagerDashboard />
           )}
 
         </div>

@@ -1,0 +1,135 @@
+.dashboardContainer {
+    padding: 20px;
+    background-color: #f3f4f6; /* Nền xám nhạt giống ảnh */
+    min-height: 100vh;
+}
+
+.title {
+    margin-top: 0;
+    color: #111827;
+    margin-bottom: 20px;
+}
+
+.loading {
+    padding: 50px;
+    text-align: center;
+    font-size: 1.2rem;
+    color: #6b7280;
+}
+
+/* TOP CARDS */
+.cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.cardIcon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-right: 15px;
+}
+
+.cardInfo p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.cardInfo h3 {
+    margin: 5px 0 0 0;
+    font-size: 1.5rem;
+    color: #111827;
+}
+
+/* CHARTS SECTION */
+.chartsGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* Cột biểu đồ Bar to gấp đôi Doughnut */
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 900px) {
+    .chartsGrid { grid-template-columns: 1fr; }
+}
+
+.chartBox {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.chartBox h3 {
+    margin-top: 0;
+    color: #111827;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+.chartWrapper {
+    height: 300px;
+}
+
+/* TABLE SECTION */
+.tableBox {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.tableBox h3 {
+    margin-top: 0;
+    color: #111827;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+.recentTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.recentTable th, .recentTable td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.recentTable th {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.statusBorrow {
+    background: #fef3c7;
+    color: #d97706;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.statusReturn {
+    background: #dcfce7;
+    color: #16a34a;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
