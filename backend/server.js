@@ -7,6 +7,7 @@ const phieuMuonRoutes = require('./routes/phieuMuonRoutes');
 const docGiaRoutes = require('./routes/docGiaRoutes');
 const phieuKhoRoutes = require('./routes/phieuKhoRoutes');
 const hoaDonRoutes = require('./routes/hoaDonRoutes');
+const thongKeRoutes = require('./routes/thongKeRoutes');
 const path = require('path');
 
 const app = express();
@@ -31,6 +32,8 @@ app.use('/api/docgia', docGiaRoutes);
 app.use('/api/phieu-kho', phieuKhoRoutes);
 
 app.use('/api/hoa-don', hoaDonRoutes);
+
+app.use('/api/thong-ke', thongKeRoutes);
 
 // Khởi chạy server
 const PORT = process.env.PORT || 5000;
