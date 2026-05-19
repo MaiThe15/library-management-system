@@ -33,3 +33,31 @@ exports.checkRole = (allowedRoles) => {
     next();
   };
 };
+
+// Middleware kiểm tra Vai Trò nội bộ của Nhân viên
+exports.checkNhanVienRole = (allowedRoleIds) => {
+    return async (req, res, next) => {
+        try {
+            // Giả sử sau khi verifyToken, bạn đã lưu thông tin nhân viên vào req.user
+            // Nếu token chưa có IDVaiTro, bạn phải query bảng NhanVien dựa vào req.user.IDTaiKhoan
+            const { NhanVien } = require('../models');
+            
+            const nhanVienInfo = await NhanVien.findOne({ 
+                where: { IDTaiKhoan: req.user.IDTaiKhoan } 
+            });
+
+            if (!nhanVienInfo || !allowedRoleIds.includes(nhanVienInfo.IDVaiTro)) {
+                return res.status(403).json({ 
+                    success: false, 
+                    message: 'Bạn không có quyền hạn (Vai trò) để thực hiện chức năng này.' 
+                });
+            }
+
+            // Gắn thông tin vai trò vào req để các controller sau có thể dùng nếu cần
+            req.user.IDVaiTro = nhanVienInfo.IDVaiTro;
+            next();
+        } catch (error) {
+            return res.status(500).json({ success: false, message: 'Lỗi xác thực quyền nhân viên.' });
+        }
+    };
+};
