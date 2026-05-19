@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar';
 import { fetchMyBorrowHistory } from '../services/phieuMuonService';
 import { updateReaderProfile } from '../services/docGiaService';
 import { fetchMyInvoices } from '../services/hoaDonService';
+import phieuDatTruocService from '../services/phieuDatTruocService';
 import styles from './ReaderAccount.module.css';
 
 const ReaderAccount = () => {
@@ -22,6 +23,9 @@ const ReaderAccount = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
 
   const [myInvoices, setMyInvoices] = useState([]);
+
+  const [danhSachDatTruoc, setDanhSachDatTruoc] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     const getHistory = async () => {
@@ -45,6 +49,20 @@ const ReaderAccount = () => {
         }
     };
     loadInvoices();
+  }, []);
+
+  const fetchWaitlist = async () => {
+      try {
+          const res = await phieuDatTruocService.getMyWaitlist();
+          // Lọc ra những phiếu đang có trạng thái CO_SAN
+          const listActive = res.data.filter(p => p.TrangThai === 'CO_SAN' || p.TrangThai === 'DANG_CHO');
+          setDanhSachDatTruoc(listActive);
+      } catch (error) {
+          console.error('Lỗi khi tải danh sách đặt trước', error);
+      }
+  };
+  useEffect(() => {
+    fetchWaitlist();
   }, []);
 
   const unpaidInvoices = myInvoices.filter(inv => inv.TrangThai === 'Chưa thanh toán');
@@ -97,6 +115,23 @@ const ReaderAccount = () => {
       setMessage({ type: 'error', text: error.message });
     }
   };
+
+  const handleHuyDatTruoc = async (IDPhieuDat, e) => {
+    e.currentTarget.blur();
+    if (isProcessing) return;
+    if (window.confirm('Bạn có chắc chắn muốn hủy đặt trước cuốn sách này?')) {
+      setIsProcessing(true);
+      try {
+        await phieuDatTruocService.huyDatTruoc(IDPhieuDat);
+        alert('Đã hủy thành công!');
+        fetchWaitlist(); // Tải lại danh sách
+      } catch (error) {
+        alert(error.response?.data?.message || 'Lỗi khi hủy');
+      } finally {
+        setIsProcessing(false);
+      }
+    }
+};
 
   return (
     <div className={styles['account-layout']}>
@@ -180,6 +215,37 @@ const ReaderAccount = () => {
             </form>
           )}
         </section>
+
+        {danhSachDatTruoc.length > 0 && (
+          <div style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '5px', marginBottom: '20px', border: '1px solid #ddd' }}>
+              <h4 style={{ margin: '0 0 10px 0' }}>📚 Sách bạn đang đặt trước</h4>
+              <ul style={{ listStyle: 'none', padding: 0 }}>
+                  {danhSachDatTruoc.map(phieu => (
+                      <li key={phieu.IDPhieuDat} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #eee' }}>
+                          <div>
+                              <b style={{ color: phieu.TrangThai === 'CO_SAN' ? '#10b981' : '#f59e0b' }}>
+                                  {phieu.TrangThai === 'CO_SAN' ? '[ĐÃ CÓ SẴN] ' : '[ĐANG CHỜ] '}
+                              </b>
+                              Cuốn "{phieu.sach?.TenSach}"
+                          </div>
+                          
+                          <button 
+                              onClick={(e) => handleHuyDatTruoc(phieu.IDPhieuDat, e)}
+                              disabled={isProcessing}
+                              style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer' }}
+                          >
+                              Hủy
+                          </button>
+                      </li>
+                  ))}
+              </ul>
+              {danhSachDatTruoc.some(p => p.TrangThai === 'CO_SAN') && (
+                  <p style={{ color: '#155724', backgroundColor: '#d4edda', padding: '8px', borderRadius: '4px', fontSize: '14px' }}>
+                      🎉 Có sách đã về! Vui lòng đến thư viện để nhận sách sớm nhất.
+                  </p>
+              )}
+          </div>
+        )}
 
         {/* --- BANNER CẢNH BÁO NỢ PHẠT --- */}
         {unpaidInvoices.length > 0 && (

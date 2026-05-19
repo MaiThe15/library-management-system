@@ -23,8 +23,8 @@ const StaffHome = () => {
 
   const roleId = user?.IDVaiTro;
   const canViewThuThu = roleId === 1 || roleId === 5 || roleId === 2;
-  const canViewKho    = roleId === 1 || roleId === 5 || roleId === 4;
   const canViewKeToan = roleId === 1 || roleId === 5 || roleId === 3;
+  const canViewKho    = roleId === 1 || roleId === 5 || roleId === 4;
   const canViewQuanLy = roleId === 1 || roleId === 5;                
   const canViewIT     = roleId === 1;
 

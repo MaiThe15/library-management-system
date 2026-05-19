@@ -41,7 +41,7 @@ const BorrowManagement = ({ books }) => {
   }, []);
 
   const searchResults = bookSearchText.trim() === '' ? [] : books
-    .filter(b => b.SoLuongSanSang > 0)
+    // .filter(b => b.SoLuongSanSang > 0)
     .filter(b => 
       b.TenSach.toLowerCase().includes(bookSearchText.toLowerCase()) || 
       b.IDSach.toString() === bookSearchText.trim()
@@ -222,7 +222,9 @@ const BorrowManagement = ({ books }) => {
                   {searchResults.map(book => (
                     <li key={book.IDSach} onClick={() => addToBorrowCart(book)} className={styles.suggestionItem}>
                       <span><strong>[{book.IDSach}]</strong> {book.TenSach}</span>
-                      <span className={styles.stockText}>Còn {book.SoLuongSanSang} cuốn</span>
+                      <span className={styles.stockText} style={{ color: book.SoLuongSanSang === 0 ? 'red' : 'inherit' }}>
+                        Còn {book.SoLuongSanSang} cuốn {book.SoLuongSanSang === 0 ? '(Có thể đang giữ cho người đặt trước)' : ''}
+                      </span>
                     </li>
                   ))}
                 </ul>

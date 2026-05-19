@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchBookById, fetchBookReviews, checkReviewEligibility, createBookReview } from '../services/bookService';
+import phieuDatTruocService from '../services/phieuDatTruocService';
 import Navbar from '../components/Navbar';
 import styles from './BookDetail.module.css';
 
@@ -44,11 +45,16 @@ const BookDetail = () => {
     });
     localStorage.setItem('cart', JSON.stringify(currentCart));
     window.dispatchEvent(new Event('cartUpdated'));
-    alert('🛒 Đã thêm vào giỏ mượn thành công!');
+    alert('Đã thêm vào giỏ mượn thành công!');
   };
 
-  const handleReserve = () => {
-    alert('⏳ Yêu cầu Đặt trước đã được ghi nhận.');
+  const handleReserve = async () => {
+    try {
+        await phieuDatTruocService.datTruocSach(book.IDSach);
+        alert('Đặt trước thành công! Chúng tôi sẽ thông báo khi sách có sẵn.');
+    } catch (error) {
+        alert(error.response?.data?.message || 'Lỗi khi đặt trước');
+    }
   };
 
   const loadData = async () => {
@@ -128,9 +134,9 @@ const BookDetail = () => {
               {/* Khối thông tin lưu trữ tĩnh */}
               <div className={styles.infoBlock}>
                 <h3 className={styles.infoTitle}>Thông tin lưu trữ</h3>
-                <p className={styles.infoText}>📌 <strong>Vị trí:</strong> {book.viTri ? `${book.viTri.KhuVuc} - Tầng ${book.viTri.Tang} (${book.viTri.KeSach})` : 'Chưa xếp kệ'}</p>
+                <p className={styles.infoText}><strong>Vị trí:</strong> {book.viTri ? `${book.viTri.KhuVuc} - Tầng ${book.viTri.Tang} (${book.viTri.KeSach})` : 'Chưa xếp kệ'}</p>
                 <p className={styles.infoText}>
-                  📚 <strong>Tình trạng:</strong> {book.SoLuongSanSang > 0 
+                  <strong>Tình trạng:</strong> {book.SoLuongSanSang > 0 
                     ? <span style={{ color: '#16a34a', fontWeight: 'bold' }}>Còn sẵn {book.SoLuongSanSang} cuốn</span> 
                     : <span style={{ color: '#dc2626', fontWeight: 'bold' }}>Đã hết sách</span>}
                 </p>
@@ -140,11 +146,11 @@ const BookDetail = () => {
               <div className={styles.actionBlock}>
                 {book.SoLuongSanSang > 0 ? (
                   <button onClick={handleAddToCart} className={styles.btnPrimary}>
-                    🛒 Thêm vào Giỏ mượn
+                    Thêm vào Giỏ mượn
                   </button>
                 ) : (
                   <button onClick={handleReserve} className={styles.btnSecondary}>
-                    ⏳ Đặt trước sách này
+                    Đặt trước sách này
                   </button>
                 )}
               </div>

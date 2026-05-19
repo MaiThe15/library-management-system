@@ -162,7 +162,7 @@ const EmployeeManagement = () => {
                                             className={emp.taiKhoan?.TrangThai === 'HOAT_DONG' ? styles.btnActionLock : styles.btnActionUnlock}
                                             onClick={() => handleToggleStatus(emp.IDNhanVien, emp.taiKhoan?.TrangThai)}
                                         >
-                                            {emp.taiKhoan?.TrangThai === 'HOAT_DONG' ? 'Khóa quyền' : 'Mở khóa'}
+                                            {emp.taiKhoan?.TrangThai === 'HOAT_DONG' ? 'Khóa tài khoản' : 'Mở khóa'}
                                         </button>
                                     </td>
                                 </tr>
