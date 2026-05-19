@@ -67,7 +67,7 @@ class AuthService {
   async login(Email, MatKhau) {
     const taiKhoan = await TaiKhoan.findOne({ where: { Email } });
     if (!taiKhoan) throw new Error('Email hoặc mật khẩu không đúng!');
-    if (taiKhoan.TrangThai === 'KHOA') throw new Error('Tài khoản đã bị khóa!');
+    if (taiKhoan.TrangThai === 'BI_KHOA') throw new Error('Tài khoản đã bị khóa!');
 
     const isMatch = await bcrypt.compare(MatKhau, taiKhoan.MatKhau);
     if (!isMatch) throw new Error('Email hoặc mật khẩu không đúng!');

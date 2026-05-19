@@ -1,4 +1,5 @@
-const { sequelize, PhieuMuon, CT_PhieuMuon, Sach, DocGia, NhanVien, HoaDon } = require('../models');
+const { sequelize, PhieuMuon, CT_PhieuMuon, Sach, DocGia, NhanVien, HoaDon, PhieuDatTruoc } = require('../models');
+const phieuDatTruocService = require('./phieuDatTruocService');
 
 const PHI_MUON_CO_BAN = 10000;
 const PHI_PHAT_MOI_NGAY = 5000;
@@ -34,9 +35,35 @@ exports.taoPhieuMuon = async (data) => {
       if (!sach) {
         throw new Error(`Sách có ID ${idSach} không tồn tại trong hệ thống.`);
       }
-      if (sach.SoLuongSanSang <= 0) {
-        throw new Error(`Sách "${sach.TenSach}" hiện đã hết trong kho.`);
+
+      // 2.1 Kiểm tra xem độc giả này có đang được giữ cuốn sách này do đã đặt trước không?
+      const phieuDatCuaDocGia = await PhieuDatTruoc.findOne({
+        where: {
+          IDDocGia: idDocGia,
+          IDSach: idSach,
+          TrangThai: 'CO_SAN'
+        },
+        transaction: t
+      });
+
+      if (phieuDatCuaDocGia) {
+        // TRƯỜNG HỢP A: Độc giả đã đặt trước và sách đã được thư viện cất giữ sẵn cho họ
+        
+        // -> Đổi trạng thái phiếu đặt thành hoàn thành
+        await phieuDatCuaDocGia.update({ TrangThai: 'HOAN_THANH' }, { transaction: t });
+        
+        // LƯU Ý QUAN TRỌNG: Ở đây ta KHÔNG trừ đi SoLuongSanSang của sách, 
+        // vì lúc người mượn trước trả sách, hệ thống đã không cộng vào kho để "giam" cuốn sách này lại rồi.
+        
+      } else {
+        if (sach.SoLuongSanSang <= 0) {
+          throw new Error(`Sách "${sach.TenSach}" hiện đã hết trong kho.`);
+        }
+        await sach.update({
+          SoLuongSanSang: sach.SoLuongSanSang - 1
+        }, { transaction: t });
       }
+
 
       // 2.2 Tạo chi tiết phiếu mượn
       await CT_PhieuMuon.create({
@@ -45,10 +72,6 @@ exports.taoPhieuMuon = async (data) => {
         TrangThai: 'Đang mượn'
       }, { transaction: t });
 
-      // 2.3 Cập nhật giảm số lượng sách sẵn sàng
-      await sach.update({
-        SoLuongSanSang: sach.SoLuongSanSang - 1
-      }, { transaction: t });
     }
 
     // COMMIT TRANSACTION: Nếu mọi thứ suôn sẻ, lưu toàn bộ thay đổi vào DB
@@ -123,13 +146,16 @@ exports.traPhieuMuon = async (idPhieuMuon, idNhanVienThucHien) => {
       // Đổi trạng thái dòng chi tiết
       await ct.update({ TrangThai: 'Đã trả' }, { transaction: t });
 
-      // Tìm cuốn sách và cộng lại 1 đơn vị vào SoLuongSanSang
-      const sach = await Sach.findByPk(ct.IDSach, { transaction: t });
-      if (sach) {
-        await sach.update({
-          SoLuongSanSang: sach.SoLuongSanSang + 1,
-          TrangThai: 'CO_SAN'
-        }, { transaction: t });
+      const hasWaitlist = await phieuDatTruocService.xuLyKhiTraSach(ct.IDSach, t);
+      if (!hasWaitlist) {
+        // Tìm cuốn sách và cộng lại 1 đơn vị vào SoLuongSanSang
+        const sach = await Sach.findByPk(ct.IDSach, { transaction: t });
+        if (sach) {
+          await sach.update({
+            SoLuongSanSang: sach.SoLuongSanSang + 1,
+            TrangThai: 'CO_SAN'
+          }, { transaction: t });
+        }
       }
     }
 

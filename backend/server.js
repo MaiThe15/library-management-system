@@ -9,6 +9,7 @@ const phieuKhoRoutes = require('./routes/phieuKhoRoutes');
 const hoaDonRoutes = require('./routes/hoaDonRoutes');
 const thongKeRoutes = require('./routes/thongKeRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const phieuDatTruocRoutes = require('./routes/phieuDatTruocRoutes');
 const path = require('path');
 
 const app = express();
@@ -26,9 +27,11 @@ app.use('/api/auth', authRoutes);
 
 app.use('/api/books', bookRoutes);
 
-app.use('/api/phieu-muon', phieuMuonRoutes);
-
 app.use('/api/docgia', docGiaRoutes);
+
+app.use('/api/phieudattruoc', phieuDatTruocRoutes);
+
+app.use('/api/phieu-muon', phieuMuonRoutes);
 
 app.use('/api/phieu-kho', phieuKhoRoutes);
 
