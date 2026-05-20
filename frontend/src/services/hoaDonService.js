@@ -19,3 +19,7 @@ export const fetchMyInvoices = async () => {
     const response = await axios.get('/hoa-don/my-invoices');
     return response.data.data; 
 };
+
+export const createExpenseInvoice = async (payload) => {
+  return await axios.post(`/hoa-don/expense`, payload);
+};

@@ -84,12 +84,12 @@ const StaffHome = () => {
             >
               Quản lý danh mục sách
             </button>
-            <button 
+            {/* <button 
               className={`${styles.navItem} ${activeTab === 'quan-ly-ton-kho' ? styles.navItemActive : ''}`}
               onClick={() => setActiveTab('quan-ly-ton-kho')}
             >
               Quản lý tồn kho
-            </button>
+            </button> */}
             <button 
               className={`${styles.navItem} ${activeTab === 'nhap-xuat-sach' ? styles.navItemActive : ''}`}
               onClick={() => setActiveTab('nhap-xuat-sach')}
@@ -103,10 +103,10 @@ const StaffHome = () => {
           <div className={styles.actorGroup}>
             <div className={styles.actorTitle}>Bộ phận kế toán</div>
             <button 
-              className={`${styles.navItem} ${activeTab === 'quan-ly-hoa-don-thu' ? styles.navItemActive : ''}`}
-              onClick={() => setActiveTab('quan-ly-hoa-don-thu')}
+              className={`${styles.navItem} ${activeTab === 'quan-ly-hoa-don' ? styles.navItemActive : ''}`}
+              onClick={() => setActiveTab('quan-ly-hoa-don')}
             >
-              Quản lý hóa đơn thu
+              Quản lý hóa đơn
             </button>
           </div>
         )}
@@ -145,7 +145,7 @@ const StaffHome = () => {
             {activeTab === 'quan-ly-danh-muc' && 'Quản lý danh mục sách'}
             {activeTab === 'quan-ly-ton-kho' && 'Báo cáo tồn kho chi tiết'}
             {activeTab === 'nhap-xuat-sach' && 'Lịch sử nhập xuất kho'}
-            {activeTab === 'quan-ly-hoa-don-thu' && 'Quản lý hóa đơn thu'}
+            {activeTab === 'quan-ly-hoa-don' && 'Quản lý hóa đơn'}
             {activeTab === 'thong-ke' && 'Thống kê'}
             {activeTab === 'quan-ly-tk-nhan-vien' && 'Quản lý tài khoản nhân viên'}
           </h2>
@@ -179,7 +179,7 @@ const StaffHome = () => {
           )}
 
           {/*  TAB 3: BỘ PHẬN KẾ TOÁN */}
-          {activeTab === 'quan-ly-hoa-don-thu' && (
+          {activeTab === 'quan-ly-hoa-don' && (
             <AccountingManagement />
           )}
 

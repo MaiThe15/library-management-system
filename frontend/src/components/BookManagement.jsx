@@ -11,7 +11,7 @@ const BookManagement = ({ books, metadata, loading, onRefreshBooks }) => {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     TenSach: '',
-    TongSoLuong: '',
+    TongSoLuong: 0,
     IDTacGia: '',
     IDViTri: '',
   });
@@ -51,7 +51,7 @@ const BookManagement = ({ books, metadata, loading, onRefreshBooks }) => {
     setEditingId(book.IDSach);
     setFormData({
       TenSach: book.TenSach,
-      TongSoLuong: book.TongSoLuong,
+      // TongSoLuong: book.TongSoLuong,
       IDTacGia: book.IDTacGia || '',
       IDViTri: book.IDViTri || '',
     });
@@ -66,7 +66,7 @@ const BookManagement = ({ books, metadata, loading, onRefreshBooks }) => {
     setEditingId(null);
     setFormData({
       TenSach: '',
-      TongSoLuong: '',
+      // TongSoLuong: '',
       IDTacGia: metadata.authors[0]?.IDTacGia || '',
       IDViTri: metadata.locations[0]?.IDViTri || '',
     });
@@ -78,13 +78,11 @@ const BookManagement = ({ books, metadata, loading, onRefreshBooks }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.TenSach || !formData.TongSoLuong) return alert('Vui lòng điền các trường bắt buộc!');
+    if (!formData.TenSach) return alert('Vui lòng điền các trường bắt buộc!');
 
     const submitData = new FormData();
     submitData.append('TenSach', formData.TenSach);
-    submitData.append('TongSoLuong', formData.TongSoLuong);
-    // submitData.append('IDTacGia', formData.IDTacGia);
-    // submitData.append('IDViTri', formData.IDViTri);
+    // submitData.append('TongSoLuong', formData.TongSoLuong);
     if (formData.IDTacGia && formData.IDTacGia !== '') {
     submitData.append('IDTacGia', formData.IDTacGia);
     }
@@ -231,10 +229,10 @@ const BookManagement = ({ books, metadata, loading, onRefreshBooks }) => {
                 <input type="text" name="TenSach" value={formData.TenSach} onChange={handleInputChange} className={styles.formInput} />
               </div>
 
-              <div className={styles.formGroup}>
+              {/* <div className={styles.formGroup}>
                 <label>Tổng số lượng nhập (*)</label>
                 <input type="number" name="TongSoLuong" value={formData.TongSoLuong} onChange={handleInputChange} className={styles.formInput} />
-              </div>
+              </div> */}
 
               <div className={styles.formGroup}>
                 <label>Tác giả</label>
