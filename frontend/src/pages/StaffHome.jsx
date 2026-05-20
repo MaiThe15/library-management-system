@@ -9,6 +9,7 @@ import InventoryManagement from '../components/InventoryManagement';
 import AccountingManagement from '../components/AccountingManagement';
 import ManagerDashboard from '../components/ManagerDashboard';
 import EmployeeManagement from '../components/EmployeeManagement';
+import StaffAccount from '../components/StaffAccount';
 
 const StaffHome = () => {
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ const StaffHome = () => {
   const [books, setBooks] = useState([]);
   const [metadata, setMetadata] = useState({ authors: [], locations: [], genres: [] });
   const [loading, setLoading] = useState(true);
+
+  const [staffInfo, setStaffInfo] = useState(user);
 
   const roleId = user?.IDVaiTro;
   const canViewThuThu = roleId === 1 || roleId === 5 || roleId === 2;
@@ -54,8 +57,17 @@ const StaffHome = () => {
       {/* SIDEBAR NAVIGATION - PHÂN RÃ ACTOR */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
-          <h3>Hệ thống Quản trị</h3>
+          <h3>Hệ Thống Quản trị</h3>
           <small>Library Smart System</small>
+        </div>
+        <div className={styles.actorGroup}>
+            <div className={styles.actorTitle}>Chung</div>
+            <button 
+              className={`${styles.navItem} ${activeTab === 'tai-khoan-ca-nhan' ? styles.active : ''}`}
+              onClick={() => setActiveTab('tai-khoan-ca-nhan')}
+            >
+              Tài khoản cá nhân
+            </button>
         </div>
         {canViewThuThu && (
           <div className={styles.actorGroup}>
@@ -84,12 +96,6 @@ const StaffHome = () => {
             >
               Quản lý danh mục sách
             </button>
-            {/* <button 
-              className={`${styles.navItem} ${activeTab === 'quan-ly-ton-kho' ? styles.navItemActive : ''}`}
-              onClick={() => setActiveTab('quan-ly-ton-kho')}
-            >
-              Quản lý tồn kho
-            </button> */}
             <button 
               className={`${styles.navItem} ${activeTab === 'nhap-xuat-sach' ? styles.navItemActive : ''}`}
               onClick={() => setActiveTab('nhap-xuat-sach')}
@@ -139,16 +145,7 @@ const StaffHome = () => {
       {/* KHU VỰC KHÔNG GIAN LÀM VIỆC CHÍNH */}
       <main className={styles.mainContent}>
         <header className={styles.topHeader}>
-          <h2>
-            {activeTab === 'quan-ly-muon-tra'}
-            {activeTab === 'thong-tin-doc-gia'}
-            {activeTab === 'quan-ly-danh-muc'}
-            {activeTab === 'quan-ly-ton-kho'}
-            {activeTab === 'nhap-xuat-sach'}
-            {activeTab === 'quan-ly-hoa-don'}
-            {activeTab === 'thong-ke'}
-            {activeTab === 'quan-ly-tk-nhan-vien'}
-          </h2>
+          <h2></h2>
           <div className={styles.userInfo}>
             <span>Nhân viên: <strong style={{ color: '#2563eb' }}>{user?.HoTen}</strong></span>
             <button onClick={() => { localStorage.clear(); navigate('/login'); }} className={styles.btnLogout}>Đăng xuất</button>
@@ -156,6 +153,11 @@ const StaffHome = () => {
         </header>
 
         <div className={styles.workspace}>
+          {/* TAB TÀI KHOẢN CÁ NHÂN */}
+          {activeTab === 'tai-khoan-ca-nhan' && (
+            <StaffAccount onUpdateSuccess={(updatedUser) => setStaffInfo(updatedUser)} />
+          )}
+
           {/* TAB 1: THỦ THƯ */}
           {activeTab === 'quan-ly-muon-tra' && (
             <BorrowManagement books={books} />

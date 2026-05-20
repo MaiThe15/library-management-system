@@ -18,7 +18,8 @@ const ReaderAccount = () => {
   const [formData, setFormData] = useState({
     HoTen: user?.HoTen || '',
     SoDienThoai: user?.SoDienThoai || '',
-    DiaChi: user?.DiaChi || ''
+    Email: user?.Email || '',
+    MatKhau: ''
   });
   const [message, setMessage] = useState({ type: '', text: '' });
 
@@ -94,11 +95,11 @@ const ReaderAccount = () => {
   // Gửi dữ liệu cập nhật lên backend
   const handleSaveProfile = async (e) => {
     e.preventDefault();
-    const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
-    if (!phoneRegex.test(formData.SoDienThoai)) {
-      alert("Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số (VD: 0912345678).");
-      return; // Dừng lại luôn, không gọi API backend nữa
-    }
+    // const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
+    // if (phoneRegex && !phoneRegex.test(formData.SoDienThoai)) {
+    //   alert("Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số (VD: 0912345678).");
+    //   return; // Dừng lại luôn, không gọi API backend nữa
+    // }
     try {
       const response = await updateReaderProfile(formData);
       if (response.success) {
@@ -163,8 +164,8 @@ const ReaderAccount = () => {
               </div>
               <div className={styles['details']}>
                 <p><strong>Họ và tên:</strong> {user?.HoTen}</p>
+                <p><strong>Email:</strong> {user?.Email || 'Chưa cập nhật'}</p>
                 <p><strong>Số điện thoại:</strong> {user?.SoDienThoai || 'Chưa cập nhật'}</p>
-                <p><strong>Địa chỉ:</strong> {user?.DiaChi || 'Chưa cập nhật'}</p>
                 <p><strong>Loại tài khoản:</strong> Độc giả</p>
               </div>
             </div>
@@ -182,20 +183,31 @@ const ReaderAccount = () => {
                 />
               </div>
               <div className={styles['form-group']}>
+                <label>Email <span style={{ color: 'red' }}>*</span></label>
+                <input 
+                  type="email" 
+                  name="Email" 
+                  value={formData.Email} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <div className={styles['form-group']}>
+                <label>Đổi mật khẩu mới (Bỏ trống nếu không đổi)</label>
+                <input 
+                  type="password" 
+                  name="MatKhau" 
+                  value={formData.MatKhau} 
+                  onChange={handleInputChange} 
+                  placeholder="Nhập mật khẩu mới..."
+                />
+              </div>
+              <div className={styles['form-group']}>
                 <label>Số điện thoại</label>
                 <input 
                   type="text" 
                   name="SoDienThoai" 
                   value={formData.SoDienThoai} 
-                  onChange={handleInputChange} 
-                />
-              </div>
-              <div className={styles['form-group']}>
-                <label>Địa chỉ</label>
-                <input 
-                  type="text" 
-                  name="DiaChi" 
-                  value={formData.DiaChi} 
                   onChange={handleInputChange} 
                 />
               </div>
@@ -206,7 +218,7 @@ const ReaderAccount = () => {
                   className={styles['btn-cancel']} 
                   onClick={() => {
                     setIsEditing(false);
-                    setFormData({ HoTen: user?.HoTen, SoDienThoai: user?.SoDienThoai, DiaChi: user?.DiaChi });
+                    setFormData({ HoTen: user?.HoTen, SoDienThoai: user?.SoDienThoai, Email: user?.Email, MatKhau: '' });
                   }}
                 >
                   Hủy
