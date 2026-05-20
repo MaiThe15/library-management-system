@@ -11,7 +11,7 @@ const AllBooks = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   
-  const [filters, setFilters] = useState({ category: '', status: '', sort: 'newest' });
+  const [filters, setFilters] = useState({ category: [], status: '', sort: 'newest' });
   const [genres, setGenres] = useState([]);
 
   const [limit, setLimit] = useState(6);
@@ -20,7 +20,13 @@ const AllBooks = () => {
   const loadData = async () => {
     try {
       // 1. Tải danh sách sách theo bộ lọc thông qua Service
-      const params = new URLSearchParams({ ...filters, page, limit: limit });
+      // const params = new URLSearchParams({ ...filters, page, limit: limit });
+      const params = new URLSearchParams({ 
+        ...filters, 
+        category: filters.category.join(','), 
+        page, 
+        limit: limit 
+      });
       const resData = await fetchFilteredBooks(params.toString()); // Gọi hàm Service
       
       setBooks(resData.books || []);
@@ -42,13 +48,25 @@ const AllBooks = () => {
   }, [page, filters.sort, filters.category]);
 
   // Logic xử lý khi chọn/bỏ chọn Thể loại
-  const handleCategoryChange = (idTheLoai) => {
-    setFilters(prev => ({
-      ...prev,
-      // Nếu click vào chính thể loại đang chọn thì sẽ bỏ chọn (Reset bộ lọc)
-      category: prev.category === idTheLoai ? '' : idTheLoai 
-    }));
-    setPage(1); // Luôn reset về trang 1 khi đổi bộ lọc
+  const handleCategoryChange = (id, isChecked) => {
+    // setFilters(prev => ({
+    //   ...prev,
+    //   // Nếu click vào chính thể loại đang chọn thì sẽ bỏ chọn (Reset bộ lọc)
+    //   category: prev.category === idTheLoai ? '' : idTheLoai 
+    // }));
+    // setPage(1); // Luôn reset về trang 1 khi đổi bộ lọc
+    setFilters(prevFilters => {
+    // Đảm bảo prevFilters.category luôn là mảng (phòng hờ undefined)
+      const currentCategories = prevFilters.category || []; 
+
+      if (isChecked) {
+        // Nếu check: Giữ các giá trị cũ, thêm id mới vào cuối mảng
+        return { ...prevFilters, category: [...currentCategories, id] };
+      } else {
+        // Nếu uncheck: Lọc mảng, bỏ đi id vừa bị uncheck
+        return { ...prevFilters, category: currentCategories.filter(item => item !== id) };
+      }
+    });
   };
 
   const totalPages = Math.ceil(total / limit) || 1;
@@ -69,8 +87,8 @@ const AllBooks = () => {
                 <input 
                   type="checkbox" 
                   id={`genre-${genre.IDTheLoai}`}
-                  checked={filters.category === genre.IDTheLoai}
-                  onChange={() => handleCategoryChange(genre.IDTheLoai)}
+                  checked={filters.category.includes(genre.IDTheLoai)}
+                  onChange={(e) => handleCategoryChange(genre.IDTheLoai, e.target.checked)}
                 /> 
                 <label htmlFor={`genre-${genre.IDTheLoai}`}>{genre.TenTheLoai}</label>
               </div>
