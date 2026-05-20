@@ -1,5 +1,6 @@
 const docGiaService = require('../services/docGiaService');
 const { DocGia, TaiKhoan } = require('../models');
+const bcrypt = require('bcryptjs');
 
 exports.getAllReaders = async (req, res) => {
   try {
@@ -31,7 +32,7 @@ exports.updateProfile = async (req, res) => {
   try {
     // req.user.id lấy từ authMiddleware sau khi giải mã JWT token
     const idTaiKhoan = req.user.IDTaiKhoan; 
-    const { HoTen, SoDienThoai, DiaChi } = req.body;
+    const { HoTen, SoDienThoai, Email, MatKhau } = req.body;
 
     if (!HoTen) {
       return res.status(400).json({ success: false, message: 'Họ tên không được để trống.' });
@@ -46,15 +47,33 @@ exports.updateProfile = async (req, res) => {
     // 2. Tiến hành cập nhật thông tin cá nhân
     docGia.HoTen = HoTen;
     docGia.SoDienThoai = SoDienThoai || docGia.SoDienThoai;
-    docGia.DiaChi = DiaChi || docGia.DiaChi;
     await docGia.save();
+
+    const taiKhoan = await TaiKhoan.findByPk(idTaiKhoan);
+    if (taiKhoan) {
+        if (Email) {
+            // Kiểm tra xem email có bị trùng với tài khoản khác không
+            const existingEmail = await TaiKhoan.findOne({ where: { Email: Email } });
+            if (existingEmail && existingEmail.IDTaiKhoan !== idTaiKhoan) {
+                return res.status(400).json({ success: false, message: 'Email này đã được sử dụng.' });
+            }
+            taiKhoan.Email = Email;
+        }
+
+        // Nếu người dùng nhập mật khẩu mới, tiến hành băm (hash) và lưu lại
+        if (MatKhau && MatKhau.trim() !== '') {
+            const salt = await bcrypt.genSalt(10);
+            taiKhoan.MatKhau = await bcrypt.hash(MatKhau, salt);
+        }
+        await taiKhoan.save();
+    }
 
     // 3. Lấy lại thông tin tài khoản đầy đủ để đồng bộ với Frontend nếu cần
     const updatedUser = {
       id: idTaiKhoan,
       HoTen: docGia.HoTen,
       SoDienThoai: docGia.SoDienThoai,
-      DiaChi: docGia.DiaChi,
+      Email: taiKhoan.Email,
       LoaiTaiKhoan: 'DOC_GIA' // Hoặc giá trị từ bảng tài khoản liên kết
     };
 
