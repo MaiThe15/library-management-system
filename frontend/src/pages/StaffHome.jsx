@@ -140,14 +140,14 @@ const StaffHome = () => {
       <main className={styles.mainContent}>
         <header className={styles.topHeader}>
           <h2>
-            {activeTab === 'quan-ly-muon-tra' && 'Quản lý mượn trả sách'}
-            {activeTab === 'thong-tin-doc-gia' && 'Quản lý tài khoản độc giả'}
-            {activeTab === 'quan-ly-danh-muc' && 'Quản lý danh mục sách'}
-            {activeTab === 'quan-ly-ton-kho' && 'Báo cáo tồn kho chi tiết'}
-            {activeTab === 'nhap-xuat-sach' && 'Lịch sử nhập xuất kho'}
-            {activeTab === 'quan-ly-hoa-don' && 'Quản lý hóa đơn'}
-            {activeTab === 'thong-ke' && 'Thống kê'}
-            {activeTab === 'quan-ly-tk-nhan-vien' && 'Quản lý tài khoản nhân viên'}
+            {activeTab === 'quan-ly-muon-tra'}
+            {activeTab === 'thong-tin-doc-gia'}
+            {activeTab === 'quan-ly-danh-muc'}
+            {activeTab === 'quan-ly-ton-kho'}
+            {activeTab === 'nhap-xuat-sach'}
+            {activeTab === 'quan-ly-hoa-don'}
+            {activeTab === 'thong-ke'}
+            {activeTab === 'quan-ly-tk-nhan-vien'}
           </h2>
           <div className={styles.userInfo}>
             <span>Nhân viên: <strong style={{ color: '#2563eb' }}>{user?.HoTen}</strong></span>

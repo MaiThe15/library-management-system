@@ -1,0 +1,302 @@
+/* BorrowManagement */
+ /* --- Khung Chứa Toàn Bộ Phân Hệ --- */
+.container {
+  padding: 10px;
+  width: 100%;
+}
+
+/* --- Thanh Điều Khiển & Nút Bật Modal --- */
+.tableControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.tableTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.btnOpenModal {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s ease;
+}
+
+.btnOpenModal:hover {
+  background-color: #1d4ed8;
+}
+
+/* --- Bảng Lịch Sử Nhật Ký Hoạt Động --- */
+.historyTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.historyTable th {
+  background-color: #f8fafc;
+  text-align: left;
+  border-bottom: 2px solid #e2e8f0;
+  padding: 14px 12px;
+  font-weight: 600;
+  color: #475569;
+  font-size: 14px;
+}
+
+.historyTable td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #edf2f7;
+  vertical-align: top;
+  font-size: 14px;
+  color: #334155;
+}
+
+.slipId {
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.readerName {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.readerPhone {
+  color: #64748b;
+  font-size: 12px;
+  display: block;
+  margin-top: 2px;
+}
+
+.bookList {
+  margin: 0;
+  padding-left: 18px;
+  color: #1e293b;
+}
+
+.bookList li {
+  margin-bottom: 4px;
+}
+
+/* --- Trạng Thái Nhãn Độc Giả --- */
+.statusBadge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.statusBorrowing {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.statusReturned {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.emptyText {
+  padding: 30px;
+  text-align: center;
+  color: #64748b;
+  font-style: italic;
+}
+
+.loadingText {
+  color: #475569;
+  font-size: 14px;
+}
+
+/* --- Cấu Trúc Khối Giao Diện Modal Popup --- */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modalContent {
+  background: white;
+  padding: 26px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 550px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modalHeader {
+  margin-top: 0;
+  margin-bottom: 22px;
+  color: #1e293b;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 12px;
+}
+
+.formLabel {
+  font-weight: 500;
+  font-size: 14px;
+  color: #344054;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.relativeGroup {
+  position: relative;
+}
+
+/* --- Ô Gợi Ý Sách --- */
+.suggestionList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 4px 0 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.suggestionItem {
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.suggestionItem:hover {
+  background-color: #f8fafc;
+}
+
+.stockText {
+  color: #64748b;
+  font-size: 12px;
+}
+
+/* --- Khối Giỏ Sách Đang Chọn --- */
+.cartContainer {
+  margin: 18px 0;
+  background-color: #f8fafc;
+  padding: 14px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.cartTitle {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.emptyCartText {
+  margin: 0;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.cartList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cartItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px dashed #e2e8f0;
+  font-size: 14px;
+}
+
+.cartItem:last-child {
+  border-bottom: none;
+}
+
+.btnRemove {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.btnRemove:hover {
+  text-decoration: underline;
+}
+
+/* --- Thời Gian Dự Kiến --- */
+.timeGroupContainer {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.timeGroup {
+  flex: 1;
+}
+
+.disabledInput {
+  background-color: #f1f5f9;
+  cursor: not-allowed;
+}
+
+/* --- Thanh Thao Tác Modal --- */
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+}
+
+.btnCancel {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 9px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btnCancel:hover {
+  background-color: #e2e8f0;
+}

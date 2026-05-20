@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { createBook, updateBook, deleteBook } from '../services/bookService';
-import styles from './BookManagement.module.css'; // Sử dụng CSS Module riêng biệt của component
+import sharedStyles from '../pages/StaffHome.module.css'; // Sử dụng CSS chuẩn của StaffHome
 
 const BookManagement = ({ books, metadata, loading, onRefreshBooks }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Trạng thái Form bên trong Modal
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     TenSach: '',
-    TongSoLuong: 0,
     IDTacGia: '',
     IDViTri: '',
   });
@@ -19,7 +17,6 @@ const BookManagement = ({ books, metadata, loading, onRefreshBooks }) => {
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [imageFile, setImageFile] = useState(null);
 
-  // Tự động cập nhật ID tác giả và vị trí mặc định khi metadata tải xong
   useEffect(() => {
     if (!isEditing && metadata.authors?.length > 0 && metadata.locations?.length > 0) {
       setFormData(prev => ({
@@ -51,7 +48,6 @@ const BookManagement = ({ books, metadata, loading, onRefreshBooks }) => {
     setEditingId(book.IDSach);
     setFormData({
       TenSach: book.TenSach,
-      // TongSoLuong: book.TongSoLuong,
       IDTacGia: book.IDTacGia || '',
       IDViTri: book.IDViTri || '',
     });
@@ -66,7 +62,6 @@ const BookManagement = ({ books, metadata, loading, onRefreshBooks }) => {
     setEditingId(null);
     setFormData({
       TenSach: '',
-      // TongSoLuong: '',
       IDTacGia: metadata.authors[0]?.IDTacGia || '',
       IDViTri: metadata.locations[0]?.IDViTri || '',
     });
@@ -82,18 +77,10 @@ const BookManagement = ({ books, metadata, loading, onRefreshBooks }) => {
 
     const submitData = new FormData();
     submitData.append('TenSach', formData.TenSach);
-    // submitData.append('TongSoLuong', formData.TongSoLuong);
-    if (formData.IDTacGia && formData.IDTacGia !== '') {
-    submitData.append('IDTacGia', formData.IDTacGia);
-    }
-    if (formData.IDViTri && formData.IDViTri !== '') {
-    submitData.append('IDViTri', formData.IDViTri);
-    }
+    if (formData.IDTacGia && formData.IDTacGia !== '') submitData.append('IDTacGia', formData.IDTacGia);
+    if (formData.IDViTri && formData.IDViTri !== '') submitData.append('IDViTri', formData.IDViTri);
     submitData.append('theLoaiIds', JSON.stringify(selectedGenres));
-    
-    if (imageFile) {
-      submitData.append('AnhBia', imageFile);
-    }
+    if (imageFile) submitData.append('AnhBia', imageFile);
 
     try {
       if (isEditing) {
@@ -128,30 +115,33 @@ const BookManagement = ({ books, metadata, loading, onRefreshBooks }) => {
   });
 
   return (
-    <div className={styles.tablePanel}>
+    <div className={sharedStyles.tablePanel}>
+      <h3 style={{ margin: 10, fontSize: '20px', fontWeight: '600' }}>Quản Lý Danh Mục Sách</h3>
       {/* THANH TÌM KIẾM VÀ NÚT TẠO FORM */}
-      <div className={styles.tableControls}>
-        <div className={styles.searchWrapper}>
-          <svg className={styles.searchIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <div className={sharedStyles.tableControls}>
+        <div className={sharedStyles.searchWrapper} style={{ maxWidth: '450px' }}>
+          <svg className={sharedStyles.searchIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
           <input 
             type="text" 
             placeholder="Tìm theo tên sách hoặc tên tác giả..." 
-            className={styles.searchInput}
+            className={sharedStyles.searchInput}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button className={styles.btnAddBook} onClick={() => setIsModalOpen(true)}>
-          <span>➕ Thêm sách mới</span>
+        <button className={sharedStyles.btnAddBook} onClick={() => setIsModalOpen(true)}>
+          <span>Thêm sách mới</span>
         </button>
       </div>
 
       {/* BẢNG DỮ LIỆU HIỂN THỊ CHÍNH */}
-      {loading ? <p className={styles.loadingText}>Đang liên kết dữ liệu...</p> : (
-        <table className={styles.dataTable}>
+      {loading ? (
+        <p style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>Đang liên kết dữ liệu...</p>
+      ) : (
+        <table className={sharedStyles.dataTable}>
           <thead>
             <tr>
               <th>Bìa</th>
@@ -169,47 +159,48 @@ const BookManagement = ({ books, metadata, loading, onRefreshBooks }) => {
                   <img 
                     src={`http://localhost:5000${book.AnhBia}`} 
                     alt="" 
-                    className={styles.bookCover}
+                    style={{ width: '42px', height: '60px', objectFit: 'cover', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
                     onError={(e) => { e.target.src = 'https://via.placeholder.com/42x60' }}
                   />
                 </td>
-                <td className={styles.bookTitle}>{book.TenSach}</td>
+                <td style={{ fontWeight: '600', color: '#1e293b' }}>{book.TenSach}</td>
                 <td>
-                  <div className={styles.bookMetaWrapper}>
-                    <span className={styles.authorName}>{book.tacGia?.TenTacGia || 'Chưa rõ'}</span>
-                    <div className={styles.genreBadges}>
+                  <div className={sharedStyles.bookMetaWrapper}>
+                    <span className={sharedStyles.authorName}>{book.tacGia?.TenTacGia || 'Chưa rõ'}</span>
+                    <div className={sharedStyles.genreBadges}>
                         {book.theLoais && book.theLoais.length > 0 ? (
                             book.theLoais.map(t => (
-                            // Sử dụng toán tử ?. để nếu t bị trống thì UI vẫn không bị sập
-                            <span key={t?.IDTheLoai} className={styles.badge}>
+                            <span key={t?.IDTheLoai} className={sharedStyles.badge}>
                                 {t?.TenTheLoai || 'Không xác định'}
                             </span>
                             ))
                         ) : (
-                            <span className={styles.badge} style={{ color: '#64748b', background: '#f1f5f9' }}>Khác</span>
+                            <span className={sharedStyles.badge} style={{ color: '#64748b', background: '#f1f5f9' }}>Khác</span>
                         )}
                     </div>
                   </div>
                 </td>
-                <td className={styles.bookLocation}>
+                <td style={{ color: '#475569' }}>
                   {book.viTri ? `${book.viTri.KhuVuc} - T${book.viTri.Tang} (${book.viTri.KeSach})` : 'N/A'}
                 </td>
                 <td style={{ textAlign: 'center' }}>
-                  <span className={`${styles.statusBadge} ${book.SoLuongSanSang > 0 ? styles.statusAvailable : styles.statusEmpty}`}>
+                  <span className={`${sharedStyles.statusBadge} ${book.SoLuongSanSang > 0 ? sharedStyles.statusAvailable : sharedStyles.statusEmpty}`}>
                     {book.SoLuongSanSang} / {book.TongSoLuong}
                   </span>
                 </td>
                 <td style={{ textAlign: 'center' }}>
-                  <div className={styles.actionGroup}>
-                    <button onClick={() => handleEditClick(book)} className={styles.btnEdit}>Sửa</button>
-                    <button onClick={() => handleDeleteClick(book.IDSach)} className={styles.btnDelete}>Xóa</button>
+                  <div className={sharedStyles.actionGroup}>
+                    <button onClick={() => handleEditClick(book)} className={sharedStyles.btnEdit}>Sửa</button>
+                    <button onClick={() => handleDeleteClick(book.IDSach)} className={sharedStyles.btnDelete}>Xóa</button>
                   </div>
                 </td>
               </tr>
             ))}
             {filteredBooks.length === 0 && (
               <tr>
-                <td colSpan="6" className={styles.emptyText}>Không tìm thấy cuốn sách nào khớp với từ khóa.</td>
+                <td colSpan="6" style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>
+                  Không tìm thấy cuốn sách nào khớp với từ khóa.
+                </td>
               </tr>
             )}
           </tbody>
@@ -218,36 +209,31 @@ const BookManagement = ({ books, metadata, loading, onRefreshBooks }) => {
 
       {/* BLOCK MODAL DIALOG POPUP */}
       {isModalOpen && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h3 className={isEditing ? styles.modalHeaderEdit : styles.modalHeaderAdd}>
-              {isEditing ? '📝 Hiệu chỉnh thông tin sách' : '➕ Nhập sách vào kho'}
+        <div className={sharedStyles.modalOverlay}>
+          <div className={sharedStyles.modalContent} style={{ maxWidth: '520px' }}>
+            <h3 style={{ color: isEditing ? '#d97706' : '#2563eb', margin: '0 0 20px 0' }}>
+              {isEditing ? 'Hiệu chỉnh thông tin sách' : 'Nhập sách vào kho'}
             </h3>
             <form onSubmit={handleSubmit}>
-              <div className={styles.formGroup}>
+              <div className={sharedStyles.formGroup}>
                 <label>Tên đầu sách (*)</label>
-                <input type="text" name="TenSach" value={formData.TenSach} onChange={handleInputChange} className={styles.formInput} />
+                <input type="text" name="TenSach" value={formData.TenSach} onChange={handleInputChange} className={sharedStyles.formInput} />
               </div>
 
-              {/* <div className={styles.formGroup}>
-                <label>Tổng số lượng nhập (*)</label>
-                <input type="number" name="TongSoLuong" value={formData.TongSoLuong} onChange={handleInputChange} className={styles.formInput} />
-              </div> */}
-
-              <div className={styles.formGroup}>
+              <div className={sharedStyles.formGroup}>
                 <label>Tác giả</label>
-                <select name="IDTacGia" value={formData.IDTacGia} onChange={handleInputChange} className={styles.formSelect}>
+                <select name="IDTacGia" value={formData.IDTacGia} onChange={handleInputChange} className={sharedStyles.formSelect}>
                   {metadata.authors?.map(author => (
                     <option key={author.IDTacGia} value={author.IDTacGia}>{author.TenTacGia}</option>
                   ))}
                 </select>
               </div>
 
-              <div className={styles.formGroup}>
+              <div className={sharedStyles.formGroup}>
                 <label>Thể loại sách (Chọn nhiều)</label>
-                <div className={styles.checkboxGrid}>
+                <div className={sharedStyles.checkboxGrid}>
                   {metadata.genres?.map(genre => (
-                    <label key={genre.IDTheLoai} className={styles.checkboxLabel}>
+                    <label key={genre.IDTheLoai} className={sharedStyles.checkboxLabel}>
                       <input 
                         type="checkbox" 
                         checked={selectedGenres.includes(genre.IDTheLoai)}
@@ -259,25 +245,25 @@ const BookManagement = ({ books, metadata, loading, onRefreshBooks }) => {
                 </div>
               </div>
 
-              <div className={styles.formGroup}>
+              <div className={sharedStyles.formGroup}>
                 <label>Vị trí lưu trữ trên kệ</label>
-                <select name="IDViTri" value={formData.IDViTri} onChange={handleInputChange} className={styles.formSelect}>
+                <select name="IDViTri" value={formData.IDViTri} onChange={handleInputChange} className={sharedStyles.formSelect}>
                   {metadata.locations?.map(loc => (
                     <option key={loc.IDViTri} value={loc.IDViTri}>{`${loc.KhuVuc} - Tầng ${loc.Tang} (${loc.KeSach})`}</option>
                   ))}
                 </select>
               </div>
 
-              <div className={styles.formGroup}>
+              <div className={sharedStyles.formGroup}>
                 <label>Ảnh bìa đầu sách</label>
-                <input type="file" id="file-input" accept="image/*" onChange={handleFileChange} className={styles.fileInputWrapper} />
+                <input type="file" id="file-input" accept="image/*" onChange={handleFileChange} style={{ fontSize: '13px', color: '#475569' }} />
               </div>
 
-              <div className={styles.modalActions}>
-                <button type="submit" className={styles.btnSubmit} style={{ backgroundColor: isEditing ? '#d97706' : '#2563eb' }}>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                <button type="submit" className={sharedStyles.btnSubmit} style={{ flex: 1, backgroundColor: isEditing ? '#d97706' : '#2563eb' }}>
                   {isEditing ? 'Cập nhật' : 'Lưu lại'}
                 </button>
-                <button type="button" onClick={closeModalAndReset} className={styles.btnCancel}>
+                <button type="button" onClick={closeModalAndReset} className={sharedStyles.btnCancel} style={{ flex: 1 }}>
                   Đóng lại
                 </button>
               </div>
