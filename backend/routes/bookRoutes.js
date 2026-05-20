@@ -7,7 +7,8 @@ const danhGiaController = require('../controllers/danhGiaController');
 
 // Route công khai: Lấy danh sách sách
 router.get('/', bookController.getAllBooks);
-router.get('/metadata', verifyToken, bookController.getBookMetadata);
+// router.get('/metadata', verifyToken, bookController.getBookMetadata);
+router.get('/metadata', bookController.getBookMetadata);
 
 // Route bảo mật: Phải đăng nhập VÀ là NHAN_VIEN mới được thêm sách
 router.post(
