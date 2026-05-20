@@ -30,7 +30,7 @@ exports.getThongKeTaiChinh = async () => {
 
     // Tổng tiền chi (Ví dụ chi mua sách từ phiếu kho)
     const tongChi = await HoaDon.sum('SoTien', {
-        where: { LoaiHoaDon: 'Chi' }
+        where: { LoaiHoaDon: 'Chi', TrangThai: 'Đã thanh toán' }
     }) || 0;
 
     return {
@@ -45,5 +45,24 @@ exports.getHoaDonByDocGia = async (idDocGia) => {
     return await HoaDon.findAll({
         where: { IDDocGia: idDocGia },
         order: [['createdAt', 'DESC']]
+    });
+};
+
+exports.taoHoaDonChiThuCong = async (data, idNhanVienKetoan) => {
+    // Đảm bảo bạn đã có sẵn const { HoaDon } = require('../models'); ở đầu file nhé
+    const { HoaDon } = require('../models'); // Thêm dòng này nếu model HoaDon chưa được khai báo
+    
+    const { lyDo, soTien, trangThai } = data;
+
+    if (!lyDo || !soTien) throw new Error('Vui lòng nhập đầy đủ lý do chi và số tiền!');
+    if (soTien <= 0) throw new Error('Số tiền chi phải lớn hơn 0đ!');
+
+    return await HoaDon.create({
+        IDNhanVien: idNhanVienKetoan,
+        IDDocGia: null,
+        LoaiHoaDon: 'Chi',
+        LyDo: lyDo,
+        SoTien: soTien,
+        TrangThai: trangThai || 'Chưa thanh toán'
     });
 };

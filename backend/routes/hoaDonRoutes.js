@@ -8,6 +8,7 @@ router.use(verifyToken); // Bắt buộc đăng nhập cho tất cả route bên
 // --- CÁC ROUTE CỦA KẾ TOÁN (NHAN_VIEN) ---
 router.get('/', checkRole(['NHAN_VIEN']), hoaDonController.getInvoices);
 router.get('/thong-ke', checkRole(['NHAN_VIEN']), hoaDonController.getFinancialSummary);
+router.post('/expense', checkRole(['NHAN_VIEN']), hoaDonController.createExpenseInvoice);
 router.put('/:id/pay', checkRole(['NHAN_VIEN']), hoaDonController.payInvoice);
 
 // --- ROUTE MỚI CỦA ĐỘC GIẢ (DOC_GIA) ---

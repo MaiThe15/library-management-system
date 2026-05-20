@@ -44,3 +44,23 @@ exports.getMyInvoices = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 };
+
+exports.createExpenseInvoice = async (req, res) => {
+    try {
+        // Lấy ID Nhân viên (kế toán) đang đăng nhập từ token
+        const idNhanVien = req.user.IDNhanVien; 
+        
+        if (!idNhanVien) {
+            return res.status(403).json({ success: false, message: 'Chỉ nhân viên mới có quyền tạo hóa đơn chi.' });
+        }
+
+        const result = await hoaDonService.taoHoaDonChiThuCong(req.body, idNhanVien);
+        return res.status(201).json({ 
+            success: true, 
+            message: 'Tạo hóa đơn chi thành công!', 
+            data: result 
+        });
+    } catch (error) {
+        return res.status(400).json({ success: false, message: error.message });
+    }
+};

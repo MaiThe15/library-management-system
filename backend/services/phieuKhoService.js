@@ -1,4 +1,4 @@
-const { PhieuKho, CT_PhieuKho, Sach, NhanVien, sequelize } = require('../models');
+const { PhieuKho, CT_PhieuKho, Sach, NhanVien, sequelize, HoaDon } = require('../models');
 
 const createPhieuKho = async (data) => {
     // Sử dụng transaction để đảm bảo tính toàn vẹn dữ liệu
@@ -59,6 +59,17 @@ const createPhieuKho = async (data) => {
                     TrangThai: trangThaiMoi
                 }, { transaction: t });
             }
+        }
+
+        if (LoaiPhieu === 'Nhập') {
+            await HoaDon.create({
+                IDNhanVien: IDNhanVien,    // ID nhân viên kho lập phiếu nhập
+                IDDocGia: null,            // Hóa đơn chi không liên quan đến độc giả
+                LoaiHoaDon: 'Chi',         // Đánh dấu đây là hóa đơn chi tiền quỹ
+                LyDo: `Chi trả tiền nhập sách mới theo Phiếu Kho #${phieuKho.IDPhieuKho}`,
+                SoTien: TongTien,          // Tổng số tiền cần thanh toán cho nhà cung cấp
+                TrangThai: 'Chưa thanh toán' // Chờ kế toán xuất quỹ bấm xác nhận duyệt chi
+            }, { transaction: t });
         }
 
         // Commit transaction nếu tất cả đều thành công
