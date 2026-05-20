@@ -144,8 +144,9 @@ class BookService {
         as: 'theLoais', 
         attributes: ['TenTheLoai'],
         through: { attributes: [] },
-        // Chỉ thêm where nếu người dùng có chọn category
-        ...(category ? { where: { IDTheLoai: category } } : {})
+        // Sử dụng split(',') để biến chuỗi "1,10" thành mảng ['1', '10']
+        // Sử dụng [Op.in] để báo cho DB biết là tìm trong mảng
+        ...(category ? { where: { IDTheLoai: { [Op.in]: category.split(',') } } } : {})
       }
     ];
 
