@@ -11,6 +11,8 @@ const BookDetail = () => {
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const user = JSON.parse(localStorage.getItem('user'));
+
   const [reviews, setReviews] = useState([]);
   const [canReview, setCanReview] = useState(false);
   // State của form viết bình luận
@@ -33,6 +35,12 @@ const BookDetail = () => {
   }, [id, navigate]);
 
   const handleAddToCart = () => {
+    if (!user) {
+      alert("Vui lòng đăng nhập để thêm sách vào giỏ mượn!");
+      navigate('/login');
+      return;
+    }
+
     const currentCart = JSON.parse(localStorage.getItem('cart')) || [];
     const isExist = currentCart.find(item => item.IDSach === book.IDSach);
     if (isExist) return alert('Sách này đã có trong giỏ mượn!');
@@ -49,6 +57,11 @@ const BookDetail = () => {
   };
 
   const handleReserve = async () => {
+    if (!user) {
+      alert("Vui lòng đăng nhập để đặt trước sách!");
+      navigate('/login');
+      return;
+    }
     try {
         await phieuDatTruocService.datTruocSach(book.IDSach);
         alert('Đặt trước thành công! Chúng tôi sẽ thông báo khi sách có sẵn.');

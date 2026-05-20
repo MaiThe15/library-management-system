@@ -25,11 +25,11 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/" element={<ReaderHome />} />
+        <Route path="/reader-home" element={<ReaderHome />} />
+        <Route path="/all-books" element={<AllBooks />} />
+        <Route path="/book/:id" element={<BookDetail />} />
         
-        {/* Route bảo vệ cho Độc giả */}
-        <Route path="/reader-home" element={
-          <PrivateRoute role="DOC_GIA"><ReaderHome /></PrivateRoute>
-        } />
         {/* Route cho phần Tài khoản của độc giả */}
         <Route path="/account" element={
           <PrivateRoute role="DOC_GIA"><ReaderAccount /></PrivateRoute>
@@ -38,19 +38,11 @@ function App() {
         <Route path="/cart" element={
           <PrivateRoute role="DOC_GIA"><Cart /></PrivateRoute>
         } />
-        {/* Route xem tất cả sách */}
-        <Route path="/all-books" element={
-          <PrivateRoute role="DOC_GIA"><AllBooks /></PrivateRoute>
-        } />
 
         {/* Route bảo vệ cho Nhân viên */}
         <Route path="/staff-home" element={
           <PrivateRoute role="NHAN_VIEN"><StaffHome /></PrivateRoute>
         } />
-
-        <Route path="/" element={<Navigate to="/login" />} />
-
-        <Route path="/book/:id" element={<BookDetail />} />
       </Routes>
     </Router>
   );
